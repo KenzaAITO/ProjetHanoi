@@ -1,16 +1,16 @@
 
 # Importing the Image class from the vision module in the BlocVision package
-from BlocRobot import InitPos
+import BlocRobot.InitPos as inititalisation
 from BlocVision.vision import Image
 
 
-def test_Image():
+def test_image():
     init = Image()
     init.initialize_game()
 
-def test_RobotControl():
-    init = InitPos()
-    init.Init()
+def test_robot_control():
+    init = inititalisation.Robot()
+    init.init()
 
 if __name__ == "__main__":
-    test_RobotControl()
+    test_robot_control()

@@ -18,7 +18,7 @@ positions = [
     (AXE_X, 200, -70)    # Emplacement Droite
 ]
 class Robot :
-    def Init():
+    def init(self):
         dobot = DobotControl()
         image = Image()
         try:

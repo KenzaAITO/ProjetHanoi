@@ -9,10 +9,10 @@ import BlocRobot.InitPos as init
 
 def main():
     intialisation = init.Robot()
-    intialisation.Init()
-    print(f"Program Start:")
+    intialisation.init()
+    print("Program Start:")
 
 
 if __name__ == "__main__":
     main()
-
+    
