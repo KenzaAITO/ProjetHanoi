@@ -17,7 +17,9 @@ while True:
     _, thresholded = cv2.threshold(gray, 127, 255, cv2.THRESH_BINARY)
 
     # Trouver les contours
-    contours, _ = cv2.findContours(thresholded, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    contours, _ = cv2.findContours(
+        thresholded, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE
+    )
 
     tailles = []
     for contour in contours:
@@ -33,9 +35,9 @@ while True:
     print("Tailles des disques :", tailles)
 
     # Afficher l'image capturée avec contours
-    cv2.imshow('Frame', frame)
+    cv2.imshow("Frame", frame)
 
-    if cv2.waitKey(1) & 0xFF == ord('q'):
+    if cv2.waitKey(1) & 0xFF == ord("q"):
         break
 
 cap.release()
