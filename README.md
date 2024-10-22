@@ -37,8 +37,6 @@ installation de poetry
 Caméra :
 opencv-python
 
-
-
 ## Getting Started
 
 ### Setup
@@ -56,7 +54,7 @@ opencv-python
 ### Visualization
 
 
-1. **Obtenir la dimension des palets:** Ensure the distances are correctly set in `constants.py` and the tag's code.
+1. **Obtenir la dimension des palets:** 
 
 2. **Run the visualization code:**
     ```bash
