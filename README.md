@@ -61,25 +61,25 @@ opencv-python
 
 ### Setup
 
-1. **Install MQTT Broker:** 
-
 
 2. **Run the Project:**
     ```bash
     poetry run python main.py
     ```
+    ou 
+    ```bash
+    make run 
+    ```
 
 ### Visualization
 
-The visualization code focuses on plotting the latest positions of the tags without printing updates. The plot should update with the latest positions received from the MQTT messages.
 
-1. **Set up distances between anchors:** Ensure the distances are correctly set in `constants.py` and the tag's code.
+1. **Obtenir la dimension des palets:** Ensure the distances are correctly set in `constants.py` and the tag's code.
 
 2. **Run the visualization code:**
     ```bash
-    python3 main.py
+    make vision
     ```
-3. **Access the visualization:** Dash is running on `http://127.0.0.1:8050/`.
 
 ## Architecture
 
@@ -144,9 +144,9 @@ graph TD;
 ## Devices
 
 
-- **Robot:** An MQTT server to receive all the position data from the tags. Note: The default configuration may not allow you to correctly receive the tag's position.
+- **Robot:** DOBOT Magician dotée d'une ventouse 
 
-- **Python Visualization:** Subscribes to the MQTT broker and visualizes the position data.
+- **Python Visualization:** WebCam 
 
 ## Sequence Diagram: 
 
