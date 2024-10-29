@@ -6,7 +6,7 @@ run:
 	@poetry run python main.py
 
 vision:
-	@poetry run python BlocVision/vision
+	@poetry run python BlocVision/vision.py
 
 robot:
 	@poetry run python BlocRobot/
