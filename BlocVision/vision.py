@@ -1,52 +1,6 @@
-'''
 import cv2
 import numpy as np
-
-# Ouvrir la caméra
-cap = cv2.VideoCapture(0)
-
-while True:
-    # Capture image
-    ret, frame = cap.read()
-    if not ret:
-        break
-
-    # Convertir en niveaux de gris
-    gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-
-    # Appliquer un seuil pour segmenter les disques
-    _, thresholded = cv2.threshold(gray, 127, 255, cv2.THRESH_BINARY)
-
-    # Trouver les contours
-    contours, _ = cv2.findContours(
-        thresholded, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE
-    )
-
-    tailles = []
-    for contour in contours:
-        # Calculer la surface et le rayon des disques
-        area = cv2.contourArea(contour)
-        (x, y), radius = cv2.minEnclosingCircle(contour)
-        tailles.append(radius)
-        # Dessiner le contour pour visualisation
-        cv2.drawContours(frame, [contour], -1, (0, 255, 0), 2)
-
-    # Afficher les tailles des disques triées
-    tailles.sort()
-    print("Tailles des disques :", tailles)
-
-    # Afficher l'image capturée avec contours
-    cv2.imshow("Frame", frame)
-
-    if cv2.waitKey(1) & 0xFF == ord("q"):
-        break
-
-cap.release()
-cv2.destroyAllWindows()
-'''
-
-import cv2
-import numpy as np
+from tkinter import Tk, Label, Button, messagebox
 
 # Paramètres de marge d'erreur pour la comparaison de taille
 MARGE_ERREUR = 5  # Par exemple 5 pixels
@@ -58,11 +12,22 @@ def capture_initial_image():
     if not ret:
         print("Erreur : Impossible de capturer l'image depuis la caméra.")
         return None
+    cv2.imshow("Image capturée", frame)  # Affiche l'image capturée pour vérifier
+    cv2.waitKey(0)
     return frame
 
 def detect_and_classify_discs(frame):
+    # Convertir en niveaux de gris et appliquer un flou pour réduire le bruit
     gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-    _, thresholded = cv2.threshold(gray, 127, 255, cv2.THRESH_BINARY)
+    blurred = cv2.GaussianBlur(gray, (5, 5), 0)
+
+    # Appliquer un seuil adaptatif pour gérer différents niveaux de lumière
+    thresholded = cv2.adaptiveThreshold(blurred, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, 
+                                        cv2.THRESH_BINARY_INV, 11, 2)
+    
+    # Affiche l'image après seuil pour vérifier visuellement
+    cv2.imshow("Image seuil", thresholded)
+    cv2.waitKey(0)
 
     # Détecte les contours des disques
     contours, _ = cv2.findContours(thresholded, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
@@ -77,8 +42,15 @@ def detect_and_classify_discs(frame):
     for contour in contours:
         (x, y), radius = cv2.minEnclosingCircle(contour)
         area = cv2.contourArea(contour)
-        # Ajouter la taille avec une marge d'erreur pour les variations
-        disques.append((int(radius), (int(x), int(y))))
+        
+        # Filtrer les petits contours (bruit) en définissant une taille minimum raisonnable
+        if area > 100:  # Ajuster cette valeur si nécessaire
+            disques.append((int(radius), (int(x), int(y))))
+
+    # Vérifier que des disques sont bien détectés
+    if len(disques) == 0:
+        print("Erreur : Aucun disque détecté après filtrage, vérifiez l'image.")
+        return None
 
     # Classer les disques par taille en utilisant une marge d'erreur
     disques = sorted(disques, key=lambda d: d[0])
@@ -94,6 +66,32 @@ def display_centers_with_crosses(frame, disques):
     cv2.waitKey(0)
     cv2.destroyAllWindows()
 
+# Interface utilisateur avec Tkinter
+def create_gui(disques, frame):
+    def on_confirm():
+        messagebox.showinfo("Confirmation", "Détection validée. Passage à l'étape suivante.")
+        root.destroy()
+        display_centers_with_crosses(frame, disques)
+
+    def on_cancel():
+        messagebox.showerror("Erreur", "Détection non validée. Relancez l'initialisation.")
+        root.destroy()
+
+    root = Tk()
+    root.title("Confirmation de la détection")
+    root.geometry("400x200")
+
+    label = Label(root, text=f"Nous avons détecté {len(disques)} disques. Est-ce correct ?", font=("Arial", 14))
+    label.pack(pady=20)
+
+    button_yes = Button(root, text="Oui", command=on_confirm, font=("Arial", 12), bg="green", fg="white", width=10)
+    button_yes.pack(side="left", padx=50, pady=20)
+
+    button_no = Button(root, text="Non", command=on_cancel, font=("Arial", 12), bg="red", fg="white", width=10)
+    button_no.pack(side="right", padx=50, pady=20)
+
+    root.mainloop()
+
 def initialize_game():
     # Capture l'image initiale
     frame = capture_initial_image()
@@ -107,9 +105,9 @@ def initialize_game():
         print("Erreur : La détection des disques a échoué.")
         return
 
-    # Si tout est bon, lance le jeu en affichant les centres des disques avec des croix
+    # Si tout est bon, demande confirmation via l'interface utilisateur
     print("Initialisation réussie ! Les disques ont été détectés et classés.")
-    display_centers_with_crosses(frame, disques)
+    create_gui(disques, frame)
 
 # Lancer l'initialisation du jeu
 initialize_game()
