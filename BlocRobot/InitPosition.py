@@ -18,7 +18,7 @@ def attendre_position(api, cible_x, cible_y, cible_z, tolerance=1.0):
         time.sleep(0.1)  # Attendre un peu avant de v�rifier � nouveau
 
 #Initialisation des positions
-def InitPos():
+def init_pos():
     api = dType.load()  # Charger l'API
 
     # D�finir la vitesse et l'acc�l�ration des mouvements
@@ -35,8 +35,8 @@ def InitPos():
     # Boucle sur chaque emplacement
     for index, (x, y, z) in enumerate(positions):
         pos = dType.GetPose(api)
-        rHead = pos[3]
-        print("D�placement vers l'emplacement ", index + 1, " : X=", x, ", Y=", y, ", Z=", z, "rHead = ", rHead)
+        rhead = pos[3]
+        print("D�placement vers l'emplacement ", index + 1, " : X=", x, ", Y=", y, ", Z=", z, "rhead = ", rhead)
 
         # D�placement vers la position d�finie
         dType.SetPTPCmd(api, 2, float(x), float(y), float(z), 0, isQueued=1)
@@ -56,4 +56,4 @@ def InitPos():
     print("Retour au point de d�part.")
     time.sleep(2)
 
-InitPos()
+init_pos()
