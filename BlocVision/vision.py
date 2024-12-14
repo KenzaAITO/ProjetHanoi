@@ -113,6 +113,4 @@ class Image:
         print("Initialisation réussie ! Les disques ont été détectés et classés.")
         self.display_centers_with_crosses(frame, disques)
 
-# Lancer l'initialisation du jeu
-init = Image()
-init.initialize_game()
+
