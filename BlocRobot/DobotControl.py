@@ -2,33 +2,35 @@
 
 import sys
 import time
-sys.path.insert(1, './DLL')
-import DobotDllType as dType
+#sys.path.insert(1, './DLL')
+#import DobotDllType as dType
+from serial.tools import list_ports
+import pydobot
+
 
 AXE_X = 220
 
-# Définir les messages de connexion
-CON_STR = {
-    dType.DobotConnect.DobotConnect_NoError: "Connexion réussie",
-    dType.DobotConnect.DobotConnect_NotFound: "Dobot non trouvé",
-    dType.DobotConnect.DobotConnect_Occupied: "Port occupé"
-}
-
 class DobotControl:
-    def __init__(self, port="COM7", baudrate=115200, home_x=AXE_X, home_y=0, home_z=50):
+    def __init__(self, port="COM12", baudrate=115200, home_x=AXE_X, home_y=0, home_z=50):
         """
         Initialise le contrôle Dobot.
-        :param port: Port COM pour la connexion
-        :param baudrate: Taux de transfert en bauds
-        :param home_x, home_y, home_z: Position initiale du bras
         """
-        self.api = dType.load()
-        self.connected = False
-        self.port = port
-        self.baudrate = baudrate
-        self.home_x = home_x
-        self.home_y = home_y
-        self.home_z = home_z
+        available_ports = list_ports.comports()
+        self.connected = False  # Initialiser 'connected' par défaut
+        try:
+            port = available_ports[4].device
+            self.api = pydobot.Dobot(port=port, verbose=True)
+            (x, y, z, r, j1, j2, j3, j4) = self.api.pose()
+        except Exception as e:
+            print(f"Erreur lors du chargement de DobotDll : {e}")
+            self.api = None
+        finally:
+            self.connected = False
+            self.port = port
+            self.baudrate = baudrate
+            self.home_x = home_x
+            self.home_y = home_y
+            self.home_z = home_z
 
     def connect(self):
         """Connexion au Dobot."""
@@ -100,4 +102,5 @@ class DobotControl:
 
     def __del__(self):
         """Destructeur pour déconnecter proprement."""
-        self.disconnect()
+        if self.connected:
+            self.disconnect()
