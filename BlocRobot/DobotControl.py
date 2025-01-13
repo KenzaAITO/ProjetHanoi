@@ -10,9 +10,10 @@ cible_z = 0
 
 class DobotControl:
     
-    def __init__(self, home_x=220, home_y=0, home_z=0):
+    def __init__(self, home_x=220, home_y=0, home_z=100):
         #Initialise le contrôle Dobot.
         self.ERROR_NOT_CONNECTED = "Le Dobot n'est pas connecte."
+        self.ERROR_INVALID_PALLET_COUNT = "Nombre de palets invalide"
         available_ports = list_ports.comports()
         if not available_ports:
             raise RuntimeError("Aucun port disponible pour connecter le Dobot.")
@@ -25,41 +26,88 @@ class DobotControl:
         self.home_x = home_x
         self.home_y = home_y
         self.home_z = home_z
+        self.device.move_to(home_x, home_y, home_z, 0, True)
 
-    def deplacer_vers_colonne_gauche(self, r=0, wait=True):
+
+    def deplacer_vers_colonne_gauche(self, nb_palet, r=0, wait=True):
         #Déplacement vers une position spécifique.
         cible_x = 220
         cible_y = -150
-        cible_z = -20
+        match nb_palet:
+            case 0:
+                cible_z = -80
+            case 1:
+                cible_z = -55
+            case 2:
+                cible_z = -30
+            case 3:
+                cible_z = -5
+            case 4:
+                cible_z = 20
+            case 5:
+                cible_z = 50
+            case _:
+                raise ValueError(self.ERROR_INVALID_PALLET_COUNT)
+            
         if not self.connected:
             raise RuntimeError(self.ERROR_NOT_CONNECTED)
 
         print(f"Déplacement vers x={cible_x}, y={cible_y}, z={cible_z}, r={r}")
-        self.device.move_to(cible_x, cible_y, 100, r, wait)
+        self.device.move_to(cible_x, cible_y, 150, r, wait)
         self.device.move_to(cible_x, cible_y, cible_z, r, wait)
 
-    def deplacer_vers_colonne_centre(self, r=0, wait=True):
+    def deplacer_vers_colonne_centre(self, nb_palet, r=0, wait=True):
         #Déplacement vers une position spécifique.
         cible_x = 220
         cible_y = 0
-        cible_z = -20
+        match nb_palet:
+            case 0:
+                cible_z = -80
+            case 1:
+                cible_z = -55
+            case 2:
+                cible_z = -30
+            case 3:
+                cible_z = -5
+            case 4:
+                cible_z = 20
+            case 5:
+                cible_z = 50
+            case _:
+                raise ValueError(self.ERROR_INVALID_PALLET_COUNT)
+            
         if not self.connected:
             raise RuntimeError(self.ERROR_NOT_CONNECTED)
 
         print(f"Déplacement vers x={cible_x}, y={cible_y}, z={cible_z}, r={r}")
-        self.device.move_to(cible_x, cible_y, 100, r, wait)
+        self.device.move_to(cible_x, cible_y, 150, r, wait)
         self.device.move_to(cible_x, cible_y, cible_z, r, wait)
     
-    def deplacer_vers_colonne_droite(self, r=0, wait=True):
+    def deplacer_vers_colonne_droite(self, nb_palet, r=0, wait=True):
         #Déplacement vers une position spécifique.
         cible_x = 220
         cible_y = 150
-        cible_z = -20
+        match nb_palet:
+            case 0:
+                cible_z = -80
+            case 1:
+                cible_z = -55
+            case 2:
+                cible_z = -30
+            case 3:
+                cible_z = -5
+            case 4:
+                cible_z = 20
+            case 5:
+                cible_z = 50
+            case _:
+                raise ValueError(self.ERROR_INVALID_PALLET_COUNT)
+        
         if not self.connected:
             raise RuntimeError(self.ERROR_NOT_CONNECTED)
 
         print(f"Déplacement vers x={cible_x}, y={cible_y}, z={cible_z}, r={r}")
-        self.device.move_to(cible_x, cible_y, 100, r, wait)
+        self.device.move_to(cible_x, cible_y, 150, r, wait)
         self.device.move_to(cible_x, cible_y, cible_z, r, wait)
 
     def activate_ventouse(self, activate=True):
@@ -82,10 +130,10 @@ class DobotControl:
     def return_to_home(self):
         #Retour a la position initiale (home).
         print(f"Retour à la position de depart : x={self.home_x}, y={self.home_y}, z={self.home_z}")
-        self.device.move_to(self.home_x, self.home_y, self.home_z, r=0, wait=True)
+        self.device.move_to(self.home_x, 150, self.home_z, r=0, wait=True)
 
     def disconnect(self):
-        """Deconnexion propre du Dobot."""
+        #Deconnexion propre du Dobot.
         if self.connected:
             print("Deconnexion du Dobot.")
             self.device.close()
