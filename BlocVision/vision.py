@@ -39,13 +39,13 @@ def detect_and_classify_discs(frame):
     gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
     _, thresholded = cv2.threshold(gray, 127, 255, cv2.THRESH_BINARY)
 
-        # Détecte les contours des disques
-        contours, _ = cv2.findContours(thresholded, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    # Détecte les contours des disques
+    contours, _ = cv2.findContours(thresholded, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
-        # Gestion de l'erreur si aucun contour n'est détecté
-        if len(contours) == 0:
-            print("Erreur : Aucun contour détecté, veuillez vérifier l'image.")
-            return None
+    # Gestion de l'erreur si aucun contour n'est détecté
+    if len(contours) == 0:
+        print("Erreur : Aucun contour détecté, veuillez vérifier l'image.")
+        return None
 
     # Stocke les tailles et positions des disques
     disques = []
@@ -75,7 +75,7 @@ def detect_and_classify_discs(frame):
     disques = sorted(disques, key=lambda d: d[0])
     print("Tailles des disques détectés (triés):", [d[0] for d in disques])
 
-        return disques
+    return disques
 
 def display_centers_with_crosses(frame, disques):
     # Vérifier que l'image est valide
@@ -121,11 +121,11 @@ def initialize_game():
         print("Erreur : L'image initiale n'a pas pu être capturée.")
         return
 
-        # Détecte et classe les disques
-        disques = self.detect_and_classify_discs(frame)
-        if disques is None:
-            print("Erreur : La détection des disques a échoué.")
-            return
+    # Détecte et classe les disques
+    disques = self.detect_and_classify_discs(frame)
+    if disques is None:
+        print("Erreur : La détection des disques a échoué.")
+        return
 
     # Si tout est bon, ouvre l'interface graphique pour confirmation
     detected_discs = disques
