@@ -36,8 +36,17 @@ def capture_initial_image():
     cap.release()
     return frame
 def detect_and_classify_discs(frame):
+    # Convertir en niveaux de gris et appliquer un flou pour réduire le bruit
     gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-    _, thresholded = cv2.threshold(gray, 127, 255, cv2.THRESH_BINARY)
+    blurred = cv2.GaussianBlur(gray, (5, 5), 0)
+
+    # Appliquer un seuil adaptatif pour gérer différents niveaux de lumière
+    thresholded = cv2.adaptiveThreshold(blurred, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, 
+                                        cv2.THRESH_BINARY_INV, 11, 2)
+    
+    # Affiche l'image après seuil pour vérifier visuellement
+    cv2.imshow("Image seuil", thresholded)
+    cv2.waitKey(0)
 
     # Détecte les contours des disques
     contours, _ = cv2.findContours(thresholded, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
@@ -122,7 +131,7 @@ def initialize_game():
         return
 
     # Détecte et classe les disques
-    disques = self.detect_and_classify_discs(frame)
+    disques = detect_and_classify_discs(frame)
     if disques is None:
         print("Erreur : La détection des disques a échoué.")
         return
@@ -144,3 +153,5 @@ def initialize_game():
     dpg.start_dearpygui()
     dpg.destroy_context()
 
+# Lancer l'initialisation du jeu
+initialize_game()
