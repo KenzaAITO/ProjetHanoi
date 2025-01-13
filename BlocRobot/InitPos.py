@@ -1,57 +1,53 @@
 #!/usr/bin/env python
 
-import time
 import sys
 import os
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'BlocRobot')))
+import time
 from DobotControl import DobotControl
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from BlocVision.vision import Image
 
+class Robot:
+    def __init__(self):
+        #Initialise le robot en connectant le Dobot et en préparant l'interface image.
+        self.dobot = DobotControl()
+        self.image = Image()
 
-AXE_X = 220
-
-# Définir les positions
-positions = [
-    (AXE_X, -200, -70),  # Emplacement Gauche
-    (AXE_X, 0, -70),     # Emplacement Centre
-    (AXE_X, 200, -70)    # Emplacement Droite
-]
-class Robot :
-    def init(self):
-        dobot = DobotControl()
-        image = Image()
+    def execute_init(self):
+        
+        #Exécute les mouvements et opérations nécessaires pour chaque position définie.
         try:
-            if dobot.connect():
-                for index, (x, y, z) in enumerate(positions):
-                    print("Déplacement vers l'emplacement {} : X={}, Y={}, Z={}".format(index + 1, x, y, z))
-                    
-                    # Mouvement au-dessus de la position
-                    dobot.move_to(x, y, 100)
+            for index in 0,1,2:
 
-                    # Initialisation de l'image
-                    if(index == 0):
-                        image.initialize_game()
-                    
-                    # Mouvement à la position cible
-                    dobot.move_to(x, y, z)
-                    
-                    # Activer la ventouse
-                    dobot.activate_ventouse(True)
-                    time.sleep(2)
-                    
-                    # Désactiver la ventouse
-                    dobot.activate_ventouse(False)
-                    
-                    # Retour à une position sécurisée
-                    dobot.move_to(x, y, 100)
+                # Mouvement au-dessus de la position
+                if(index == 0):
+                    self.dobot.deplacer_vers_colonne_droite()
+                if(index == 1):
+                    self.dobot.deplacer_vers_colonne_centre()
+                if(index == 2):
+                    self.dobot.deplacer_vers_colonne_gauche()
 
-                # Retour au point de départ
-                print("Retour au point de départ.")
-                dobot.move_to(dobot.home_x, dobot.home_y, dobot.home_z)
+                # Initialisation de l'image si à la première position
+                #if index == 0:
+                #     self.image.initialize_game()
+
+                # Activer la ventouse pour ramasser
+                self.dobot.activate_ventouse(True)
+
+                time.sleep(1)
+
+                # Désactiver la ventouse pour déposer
+                self.dobot.activate_ventouse(False)
+
+            # Retour au point de départ
+            print("Retour au point de départ.")
+            self.dobot.return_to_home()
 
         except Exception as e:
-            print("Une erreur s'est produite : {}".format(e))
+            print(f"Une erreur s'est produite : {e}")
+
 
 if __name__ == "__main__":
-    Robot.Init()
+    robot = Robot()
+    robot.execute_init()
+    robot.dobot.disconnect()

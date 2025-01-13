@@ -1,75 +1,125 @@
 #!/usr/bin/env python
 
-import sys
 import time
-sys.path.insert(1,'./DLL')
-import DobotDllType as dType
+from serial.tools import list_ports
+import pydobot
 
-AXE_X = 220
-
-# Définir les messages de connexion
-CON_STR = {
-    dType.DobotConnect.DobotConnect_NoError: "DobotConnect_NoError",
-    dType.DobotConnect.DobotConnect_NotFound: "DobotConnect_NotFound",
-    dType.DobotConnect.DobotConnect_Occupied: "DobotConnect_Occupied"
-}
+cible_x = 220
+cible_y = 0
+cible_z = 0
 
 class DobotControl:
-    def __init__(self, port="COM12", baudrate=115200, home_x=AXE_X, home_y=0, home_z=50):
-        self.api = dType.load()
-        self.connected = False
-        self.port = port
-        self.baudrate = baudrate
+    
+    def __init__(self, home_x=220, home_y=0, home_z=0):
+        #Initialise le contrôle Dobot.
+        self.ERROR_NOT_CONNECTED = "Le Dobot n'est pas connecte."
+        available_ports = list_ports.comports()
+        if not available_ports:
+            raise RuntimeError("Aucun port disponible pour connecter le Dobot.")
+        print(f'available ports: {[x.device for x in available_ports]}')
+
+        self.port = available_ports[4].device  # Choisir le port approprié
+        print(f"Connexion au port : {self.port}")
+        self.device = pydobot.Dobot(port=self.port, verbose=True)
+        self.connected = True
         self.home_x = home_x
         self.home_y = home_y
         self.home_z = home_z
 
-    def connect(self):
-        """Connexion au Dobot."""
-        state = dType.ConnectDobot(self.api, self.port, self.baudrate)[0]
-        if state == dType.DobotConnect.DobotConnect_NoError:
-            print("Connexion réussie : {}".format(CON_STR[state]))
-            self._initialize_parameters()
-            self.connected = True
-        else:
-            print("Échec de la connexion : {}".format(CON_STR[state]))
-        return self.connected
+    def deplacer_vers_colonne_gauche(self, r=0, wait=True):
+        #Déplacement vers une position spécifique.
+        cible_x = 220
+        cible_y = -150
+        cible_z = -20
+        if not self.connected:
+            raise RuntimeError(self.ERROR_NOT_CONNECTED)
+
+        print(f"Déplacement vers x={cible_x}, y={cible_y}, z={cible_z}, r={r}")
+        self.device.move_to(cible_x, cible_y, 100, r, wait)
+        self.device.move_to(cible_x, cible_y, cible_z, r, wait)
+
+    def deplacer_vers_colonne_centre(self, r=0, wait=True):
+        #Déplacement vers une position spécifique.
+        cible_x = 220
+        cible_y = 0
+        cible_z = -20
+        if not self.connected:
+            raise RuntimeError(self.ERROR_NOT_CONNECTED)
+
+        print(f"Déplacement vers x={cible_x}, y={cible_y}, z={cible_z}, r={r}")
+        self.device.move_to(cible_x, cible_y, 100, r, wait)
+        self.device.move_to(cible_x, cible_y, cible_z, r, wait)
+    
+    def deplacer_vers_colonne_droite(self, r=0, wait=True):
+        #Déplacement vers une position spécifique.
+        cible_x = 220
+        cible_y = 150
+        cible_z = -20
+        if not self.connected:
+            raise RuntimeError(self.ERROR_NOT_CONNECTED)
+
+        print(f"Déplacement vers x={cible_x}, y={cible_y}, z={cible_z}, r={r}")
+        self.device.move_to(cible_x, cible_y, 100, r, wait)
+        self.device.move_to(cible_x, cible_y, cible_z, r, wait)
+
+    def activate_ventouse(self, activate=True):
+        #Activer ou désactiver la ventouse.
+        if not self.connected:
+            raise RuntimeError(self.ERROR_NOT_CONNECTED)
+
+        self.device.suck(activate)
+        print("Ventouse activee" if activate else "Ventouse désactivee")
+
+    def get_pose(self):
+        #Obtenir la position actuelle du Dobot.
+        if not self.connected:
+            raise RuntimeError(self.ERROR_NOT_CONNECTED)
+
+        pose = self.device.pose()
+        print(f"Position actuelle: x={pose[0]}, y={pose[1]}, z={pose[2]}, r={pose[3]}")
+        return pose
+
+    def return_to_home(self):
+        #Retour a la position initiale (home).
+        print(f"Retour à la position de depart : x={self.home_x}, y={self.home_y}, z={self.home_z}")
+        self.device.move_to(self.home_x, self.home_y, self.home_z, r=0, wait=True)
 
     def disconnect(self):
-        """Déconnexion du Dobot."""
+        """Deconnexion propre du Dobot."""
         if self.connected:
-            dType.DisconnectDobot(self.api)
-            print("Dobot déconnecté.")
+            print("Deconnexion du Dobot.")
+            self.device.close()
             self.connected = False
 
-    def _initialize_parameters(self):
-        """Initialisation des paramètres du bras."""
-        dType.SetQueuedCmdClear(self.api)
-        dType.SetCmdTimeout(self.api, 1000)
-        dType.SetPTPJointParams(self.api, 200, 200, 200, 200, 200, 200, 200, 200)
-        dType.SetPTPCoordinateParams(self.api, 100, 100, 100, 100)
-        dType.SetPTPCommonParams(self.api, 200, 200)
-        dType.SetHOMECmd(self.api, temp=0, isQueued=1)
+    def __del__(self):
+        """Destructeur pour deconnecter proprement."""
+        self.disconnect()
 
-    def move_to(self, x, y, z, r=0, wait=True):
-        """Déplacement vers une position spécifique."""
-        dType.SetPTPCmd(self.api, 2, x, y, z, r, isQueued=1)
-        if wait:
-            self.attente_position(x, y, z)
 
-    def attente_position(self, cible_x, cible_y, cible_z, tolerance=1.0):
-        """Attendre que le bras atteigne une position donnée."""
-        while True:
-            pose = dType.GetPose(self.api)
-            current_x, current_y, current_z = pose[0], pose[1], pose[2]
-            if (abs(current_x - cible_x) < tolerance and
-                abs(current_y - cible_y) < tolerance and
-                abs(current_z - cible_z) < tolerance):
-                break
-            time.sleep(0.1)
+# if __name__ == "__main__":
+    # try:
+    #     # Initialisation du contrôleur
+    #     dobot = DobotControl()
 
-    def activate_ventourse(self, activate=True):
-        """Activer ou désactiver la ventouse."""
-        dType.SetEndEffectorSuctionCup(self.api, enableCtrl=1, on=1 if activate else 0, isQueued=1)
-        print("Ventouse activée" if activate else "Ventouse désactivée")
+    #     # Obtenir la position actuelle
+    #     pose = dobot.get_pose()
 
+    #     # Déplacement test
+    #     dobot.move_to(pose[0] + 20, pose[1], pose[2])
+    #     dobot.move_to(pose[0], pose[1], pose[2])
+
+    #     # Activer et désactiver la ventouse
+    #     dobot.activate_ventouse(True)
+    #     time.sleep(2)
+    #     dobot.activate_ventouse(False)
+
+    #     # Retour à la position initiale
+    #     dobot.return_to_home()
+
+    # except Exception as e:
+    #     print(f"Erreur : {e}")
+
+    # finally:
+    #     # Nettoyage final
+    #     if 'dobot' in locals():
+    #         dobot.disconnect()
