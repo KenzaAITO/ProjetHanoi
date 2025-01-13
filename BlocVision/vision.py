@@ -36,16 +36,25 @@ def capture_initial_image():
     cap.release()
     return frame
 def detect_and_classify_discs(frame):
+    # Convertir en niveaux de gris et appliquer un flou pour réduire le bruit
     gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-    _, thresholded = cv2.threshold(gray, 127, 255, cv2.THRESH_BINARY)
+    blurred = cv2.GaussianBlur(gray, (5, 5), 0)
 
-        # Détecte les contours des disques
-        contours, _ = cv2.findContours(thresholded, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    # Appliquer un seuil adaptatif pour gérer différents niveaux de lumière
+    thresholded = cv2.adaptiveThreshold(blurred, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, 
+                                        cv2.THRESH_BINARY_INV, 11, 2)
+    
+    # Affiche l'image après seuil pour vérifier visuellement
+    cv2.imshow("Image seuil", thresholded)
+    cv2.waitKey(0)
 
-        # Gestion de l'erreur si aucun contour n'est détecté
-        if len(contours) == 0:
-            print("Erreur : Aucun contour détecté, veuillez vérifier l'image.")
-            return None
+    # Détecte les contours des disques
+    contours, _ = cv2.findContours(thresholded, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+
+    # Gestion de l'erreur si aucun contour n'est détecté
+    if len(contours) == 0:
+        print("Erreur : Aucun contour détecté, veuillez vérifier l'image.")
+        return None
 
     # Stocke les tailles et positions des disques
     disques = []
@@ -75,7 +84,7 @@ def detect_and_classify_discs(frame):
     disques = sorted(disques, key=lambda d: d[0])
     print("Tailles des disques détectés (triés):", [d[0] for d in disques])
 
-        return disques
+    return disques
 
 def display_centers_with_crosses(frame, disques):
     # Vérifier que l'image est valide
@@ -121,11 +130,11 @@ def initialize_game():
         print("Erreur : L'image initiale n'a pas pu être capturée.")
         return
 
-        # Détecte et classe les disques
-        disques = self.detect_and_classify_discs(frame)
-        if disques is None:
-            print("Erreur : La détection des disques a échoué.")
-            return
+    # Détecte et classe les disques
+    disques = detect_and_classify_discs(frame)
+    if disques is None:
+        print("Erreur : La détection des disques a échoué.")
+        return
 
     # Si tout est bon, ouvre l'interface graphique pour confirmation
     detected_discs = disques
@@ -144,3 +153,5 @@ def initialize_game():
     dpg.start_dearpygui()
     dpg.destroy_context()
 
+# Lancer l'initialisation du jeu
+initialize_game()
