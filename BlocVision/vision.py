@@ -34,6 +34,7 @@ def capture_initial_image():
 
     cap.release()
     return frame
+
 def detect_and_classify_discs(frame):
     # Convertir en niveaux de gris et appliquer un flou pour réduire le bruit
     gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
@@ -120,7 +121,7 @@ def cancel_detection_callback():
     print("Confirmation refusée. Relancez l'initialisation.")
     dpg.stop_dearpygui()
 
-def initialize_game():
+def initialize_game(self):
     global detected_discs, detected_frame
 
     # Capture l'image initiale
@@ -129,11 +130,11 @@ def initialize_game():
         print("Erreur : L'image initiale n'a pas pu être capturée.")
         return
 
-    # Détecte et classe les disques
-    disques = detect_and_classify_discs(frame)
-    if disques is None:
-        print("Erreur : La détection des disques a échoué.")
-        return
+        # Détecte et classe les disques
+        disques = self.detect_and_classify_discs(frame)
+        if disques is None:
+            print("Erreur : La détection des disques a échoué.")
+            return
 
     # Si tout est bon, ouvre l'interface graphique pour confirmation
     detected_discs = disques
