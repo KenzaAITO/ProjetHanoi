@@ -21,9 +21,12 @@ class Robot:
 
                 # Mouvement au-dessus de la position
                 if(index == 0):
-                    self.dobot.deplacer_vers_colonne_droite(4)
+                    self.dobot.deplacer_vers_colonne_droite()
+                    self.dobot.grab_pallet(5, True)
+                    self.dobot.grab_pallet(5, False)
                 if(index == 1):
                     self.dobot.deplacer_vers_colonne_centre(0)
+
                 if(index == 2):
                     self.dobot.deplacer_vers_colonne_gauche(0)
 
