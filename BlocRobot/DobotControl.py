@@ -37,8 +37,9 @@ class DobotControl:
         if not self.connected:
             raise RuntimeError(self.ERROR_NOT_CONNECTED)
 
-        print(f"Déplacement vers x={self.cible_x}, y={150}, z={self.cible_z}, r={r}")
+        print(f"Déplacement vers x={self.cible_x}, y={self.cible_y}, z={150}, r={r}")
         self.device.move_to(self.cible_x, self.cible_y, 150, r, wait)
+        print(f"Position actuelle : x={self.cible_x}, y={self.cible_y}, z={self.cible_z}, r={r}")
 
     def deplacer_vers_colonne_centre(self, r=0, wait=True):
         #Déplacement vers une position spécifique.
@@ -48,8 +49,9 @@ class DobotControl:
         if not self.connected:
             raise RuntimeError(self.ERROR_NOT_CONNECTED)
 
-        print(f"Déplacement vers x={self.cible_x}, y={150}, z={self.cible_z}, r={r}")
+        print(f"Déplacement vers x={self.cible_x}, y={self.cible_y}, z={150}, r={r}")
         self.device.move_to(self.cible_x, self.cible_y, 150, r, wait)
+        print(f"Position actuelle : x={self.cible_x}, y={self.cible_y}, z={self.cible_z}, r={r}")
     
     def deplacer_vers_colonne_droite(self, r=0, wait=True):
         #Déplacement vers une position spécifique.
@@ -59,8 +61,9 @@ class DobotControl:
         if not self.connected:
             raise RuntimeError(self.ERROR_NOT_CONNECTED)
 
-        print(f"Déplacement vers x={self.cible_x}, y={150}, z={self.cible_z}, r={r}")
+        print(f"Déplacement vers x={self.cible_x}, y={self.cible_y}, z={150}, r={r}")
         self.device.move_to(self.cible_x, self.cible_y, 150, r, wait)
+        print(f"Position actuelle : x={self.cible_x}, y={self.cible_y}, z={self.cible_z}, r={r}")
 
     def grab_pallet(self, nb_palet, r=0, wait=True, grab=True):
         print(f"Nombre de palets à saisir : {nb_palet}")
@@ -114,8 +117,8 @@ class DobotControl:
 
     def return_to_home(self):
         #Retour a la position initiale (home).
-        print(f"Retour à la position de depart : x={self.home_x}, y={self.home_y}, z={self.home_z}")
-        self.device.move_to(self.home_x, 150, self.home_z, r=0, wait=True)
+        print(f"Retour à la position de depart : x={self.home_x}, y={self.home_y}, z={150}")
+        self.device.move_to(self.home_x, self.home_y, 150, r=0, wait=True)
 
     def disconnect(self):
         #Deconnexion propre du Dobot.
