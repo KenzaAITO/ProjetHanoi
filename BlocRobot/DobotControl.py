@@ -65,6 +65,8 @@ class DobotControl:
     def grab_pallet(self, nb_palet, r=0, wait=True, grab=True):
         print(f"Nombre de palets à saisir : {nb_palet}")
         #Saisir un palet.
+        if(grab == False):
+            nb_palet += 1;  # Ajout du palet à déposer
         match nb_palet:
             case 0:
                 self.cible_z = -80
