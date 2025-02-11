@@ -4,9 +4,6 @@ import time
 from serial.tools import list_ports
 import pydobot
 
-cible_x = 220
-cible_y = 0
-cible_z = 0
 
 class DobotControl:
     
@@ -26,69 +23,72 @@ class DobotControl:
         self.home_x = home_x
         self.home_y = home_y
         self.home_z = home_z
+        self.cible_x = 220
+        self.cible_y = 0
+        self.cible_z = 0
         self.device.move_to(home_x, home_y, home_z, 0, True)
 
 
     def deplacer_vers_colonne_gauche(self, r=0, wait=True):
         #Déplacement vers une position spécifique.
-        cible_x = 220
-        cible_y = -150
+        self.cible_x = 220
+        self.cible_y = -150
             
         if not self.connected:
             raise RuntimeError(self.ERROR_NOT_CONNECTED)
 
-        print(f"Déplacement vers x={cible_x}, y={150}, z={cible_z}, r={r}")
-        self.device.move_to(cible_x, cible_y, 150, r, wait)
+        print(f"Déplacement vers x={self.cible_x}, y={150}, z={self.cible_z}, r={r}")
+        self.device.move_to(self.cible_x, self.cible_y, 150, r, wait)
 
     def deplacer_vers_colonne_centre(self, r=0, wait=True):
         #Déplacement vers une position spécifique.
-        cible_x = 220
-        cible_y = 0
+        self.cible_x = 220
+        self.cible_y = 0
             
         if not self.connected:
             raise RuntimeError(self.ERROR_NOT_CONNECTED)
 
-        print(f"Déplacement vers x={cible_x}, y={150}, z={cible_z}, r={r}")
-        self.device.move_to(cible_x, cible_y, 150, r, wait)
+        print(f"Déplacement vers x={self.cible_x}, y={150}, z={self.cible_z}, r={r}")
+        self.device.move_to(self.cible_x, self.cible_y, 150, r, wait)
     
     def deplacer_vers_colonne_droite(self, r=0, wait=True):
         #Déplacement vers une position spécifique.
-        cible_x = 220
-        cible_y = 150
+        self.cible_x = 220
+        self.cible_y = 150
         
         if not self.connected:
             raise RuntimeError(self.ERROR_NOT_CONNECTED)
 
-        print(f"Déplacement vers x={cible_x}, y={150}, z={cible_z}, r={r}")
-        self.device.move_to(cible_x, cible_y, 150, r, wait)
+        print(f"Déplacement vers x={self.cible_x}, y={150}, z={self.cible_z}, r={r}")
+        self.device.move_to(self.cible_x, self.cible_y, 150, r, wait)
 
     def grab_pallet(self, nb_palet, r=0, wait=True, grab=True):
         print(f"Nombre de palets à saisir : {nb_palet}")
         #Saisir un palet.
         match nb_palet:
             case 0:
-                cible_z = -80
+                self.cible_z = -80
             case 1:
-                cible_z = -55
+                self.cible_z = -55
             case 2:
-                cible_z = -30
+                self.cible_z = -30
             case 3:
-                cible_z = -5
+                self.cible_z = -5
             case 4:
-                cible_z = 20
+                self.cible_z = 20
             case 5:
-                cible_z = 50
+                self.cible_z = 50
             case _:
                 raise ValueError(self.ERROR_INVALID_PALLET_COUNT)
         
-        print(f"Position actuelle : x={cible_x}, y={cible_y}, z={cible_z}, r={r}")
+        print(f"Position actuelle : x={self.cible_x}, y={self.cible_y}, z={self.cible_z}, r={r}")
 
         if not self.connected:
             raise RuntimeError(self.ERROR_NOT_CONNECTED)
-        self.device.move_to(cible_x, cible_y, cible_z, r, wait)
+        self.device.move_to(self.cible_x, self.cible_y, self.cible_z, r, wait)
         self.activate_ventouse(grab)
         print("Palet saisi")
-        self.device.move_to(cible_x, cible_y, 150, r, wait)
+        self.device.move_to(self.cible_x, self.cible_y, 150, r, wait)
 
     def activate_ventouse(self, activate=True):
         #Activer ou désactiver la ventouse.
