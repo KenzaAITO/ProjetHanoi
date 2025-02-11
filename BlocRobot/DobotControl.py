@@ -89,7 +89,10 @@ class DobotControl:
             raise RuntimeError(self.ERROR_NOT_CONNECTED)
         self.device.move_to(self.cible_x, self.cible_y, self.cible_z, r, wait)
         self.activate_ventouse(grab)
-        print("Palet saisi")
+        if grab:
+            print("Palet saisi")
+        else:
+            print("Palet déposé")
         self.device.move_to(self.cible_x, self.cible_y, 150, r, wait)
 
     def activate_ventouse(self, activate=True):
