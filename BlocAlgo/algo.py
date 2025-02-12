@@ -1,67 +1,70 @@
-def hanoi_iterative(nb_palet_camera):
+def hanoi_iteratif(nb_disques):
     """
-    Algorithme itératif pour résoudre la Tour de Hanoï en partant toujours de l'axe 1.
-
-    Parameters:
-    nb_palet_camera (int): Nombre de disques.
-
-    Returns:
-    list of tuple: Liste des mouvements sous la forme 
-                   (numéro_du_coup, axe_d'origine, axe_destination, nb_palets_restants_sur_origine)
+    Algorithme itératif pour résoudre le problème des Tours de Hanoï.
+    
+    Paramètres :
+    nb_disques (int) : Nombre total de disques à déplacer.
+    
+    Retourne :
+    list of tuple : Liste des mouvements sous la forme
+                    (numéro_du_coup, axe_d'origine, axe_destination, nb_disques_restants_sur_origine)
     """
-    movements = []
-    source, auxiliary, destination = 1, 2, 3
+    mouvements = []  # Liste pour enregistrer les mouvements effectués
+    source, auxiliaire, destination = 1, 2, 3  # Définition des axes
 
-    # Si le nombre de disques est pair, on inverse auxiliaire et destination
-    if nb_palet_camera % 2 == 0:
-        auxiliary, destination = destination, auxiliary
+    # Si le nombre de disques est pair, on échange les rôles de l'auxiliaire et de la destination
+    if nb_disques % 2 == 0:
+        auxiliaire, destination = destination, auxiliaire
 
-    # Initialisation des tours
-    towers = {1: list(reversed(range(1, nb_palet_camera + 1))), 2: [], 3: []}
+    # Initialisation des tours :
+    # - La tour 1 contient tous les disques, du plus grand (en bas) au plus petit (en haut)
+    # - Les tours 2 et 3 sont vides au départ
+    tours = {1: list(reversed(range(1, nb_disques + 1))), 2: [], 3: []}
 
-    total_moves = (2 ** nb_palet_camera) - 1
+    total_mouvements = (2 ** nb_disques) - 1  # Nombre total de déplacements requis
 
-    for move in range(1, total_moves + 1):
-        if move % 3 == 1:
-            from_tower, to_tower = source, destination
-        elif move % 3 == 2:
-            from_tower, to_tower = source, auxiliary
+    # Boucle principale pour effectuer les déplacements
+    for coup in range(1, total_mouvements + 1):
+        if coup % 3 == 1:
+            origine, destination = source, destination
+        elif coup % 3 == 2:
+            origine, destination = source, auxiliaire
         else:
-            from_tower, to_tower = auxiliary, destination
+            origine, destination = auxiliaire, destination
 
-        # Vérification des mouvements valides
-        if towers[from_tower] and (not towers[to_tower] or towers[from_tower][-1] < towers[to_tower][-1]):
-            disk = towers[from_tower].pop()
-            towers[to_tower].append(disk)
-        elif towers[to_tower] and (not towers[from_tower] or towers[to_tower][-1] < towers[from_tower][-1]):
-            disk = towers[to_tower].pop()
-            towers[from_tower].append(disk)
-            from_tower, to_tower = to_tower, from_tower  # Correction de l'ordre
+        # Vérification avant de déplacer un disque
+        if tours[origine] and (not tours[destination] or tours[origine][-1] < tours[destination][-1]):
+            disque = tours[origine].pop()
+            tours[destination].append(disque)
+        elif tours[destination] and (not tours[origine] or tours[destination][-1] < tours[origine][-1]):
+            disque = tours[destination].pop()
+            tours[origine].append(disque)
+            origine, destination = destination, origine  # Correction de l'ordre si nécessaire
 
-        # Ajout du mouvement avec mise à jour du nombre de disques restants
-        movements.append((move, from_tower, to_tower, len(towers[from_tower])))
+        # Enregistrement du mouvement
+        mouvements.append((coup, origine, destination, len(tours[origine])))
 
-    return movements
+    return mouvements
 
 
-def afficher_mouvements(movements):
+def afficher_mouvements(mouvements):
     """
-    Affiche les mouvements du jeu de Hanoï sous forme de tableau.
-
-    Parameters:
-    movements (list): Liste des mouvements sous forme de tuples.
+    Affiche la séquence des mouvements sous forme de tableau.
+    
+    Paramètres :
+    mouvements (list) : Liste des mouvements sous forme de tuples.
     """
     print("\n=== Mouvements du jeu de Hanoï ===")
     print(f"{'Coup':<6}{'Origine':<8}{'Destination':<12}{'Restants'}")
     print("-" * 35)
 
-    for move in movements:
-        print(f"{move[0]:<6}{move[1]:<8}{move[2]:<12}{move[3]}")
+    for mouvement in mouvements:
+        print(f"{mouvement[0]:<6}{mouvement[1]:<8}{mouvement[2]:<12}{mouvement[3]}")
 
 
-# Test avec 5 disques
+# Test avec 4 disques
 if __name__ == "__main__":
-    n_disks = 4
-    result = hanoi_iterative(n_disks)
+    n_disques = 4  # Modifier ce nombre pour tester avec plus ou moins de disques
+    resultat = hanoi_iteratif(n_disques)
 
-    afficher_mouvements(result)
+    afficher_mouvements(resultat)
