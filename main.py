@@ -1,4 +1,4 @@
-
+/**
 import sys
 import os
 
@@ -6,14 +6,74 @@ import os
 sys.path.append(os.path.join(os.path.dirname(__file__), 'libs'))
 
 import BlocVision.vision as vision
+from BlocVision.vision import initialize_game
 import BlocRobot.InitPos as init
 
 def main():
-    intialisation = init.Robot()
-    intialisation.init()
     print("Program Start:")
+    #partie initialisation 
+    intialisation = init.Robot()
+    #intialisation.init() 
+
+    initialize_game()
+
+    #lancement de l'interface
+    
 
     
 if __name__ == "__main__":
     main()
     
+
+**/
+
+
+
+
+
+    # main.py
+
+from robot import Robot  # Importation de la classe Robot
+from vision import Vision  # Importation de la classe Vision
+from algo import hanoi_iterative  # Importation de l'algorithme de la tour de Hanoï
+
+def main():
+    """
+    Programme principal pour résoudre la Tour de Hanoï avec un robot et une caméra.
+    """
+    
+    # === 1. INITIALISATION DES COMPOSANTS ===
+    print("Initialisation du robot...")
+    robot = Robot()  # Création de l'instance du robot
+
+    print("Initialisation de la caméra...")
+    camera = Vision()  # Création de l'instance de la caméra
+
+    # === 2. ACQUISITION DE L'ÉTAT INITIAL ===
+    print("Prise de photo pour analyser la tour d'origine...")
+    nb_palet_camera = camera.detecter_nombre_palets()  # Détection du nombre de palets sur l'axe d'origine
+
+    if nb_palet_camera == 0:
+        print("Erreur : Aucun palet détecté. Vérifiez la caméra.")
+        return
+
+    print(f"Nombre de palets détectés : {nb_palet_camera}")
+
+    # === 3. CALCUL DES DÉPLACEMENTS SELON L'ALGORITHME DE HANOÏ ===
+    print("Calcul des déplacements...")
+    mouvements = hanoi_iterative(nb_palet_camera)  # Génération de la liste des déplacements
+
+    print(f"{len(mouvements)} déplacements générés.")
+
+    # === 4. EXÉCUTION DES DÉPLACEMENTS PAR LE ROBOT ===
+    for move in mouvements:
+        coup, origine, destination, restants = move
+        print(f"Déplacement {coup}: {origine} → {destination} ({restants} palets restants)")
+        
+        # Déplacer le robot en fonction du mouvement généré
+        robot.deplacer(origine, destination)
+
+    print("Résolution de la Tour de Hanoï terminée !")
+
+if __name__ == "__main__":
+    main()

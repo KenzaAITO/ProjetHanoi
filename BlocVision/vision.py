@@ -35,6 +35,7 @@ def capture_initial_image():
 
     cap.release()
     return frame
+
 def detect_and_classify_discs(frame):
     # Convertir en niveaux de gris et appliquer un flou pour réduire le bruit
     gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
