@@ -1,31 +1,27 @@
-def hanoi_iterative(n, source="Source", auxiliary="Auxiliary", destination="Destination"):
+def hanoi_iterative(nb_palet_camera):
     """
-    Algorithme itératif pour résoudre la Tour de Hanoï.
+    Algorithme itératif pour résoudre la Tour de Hanoï en partant toujours de l'axe 1.
 
     Parameters:
-    n (int): Nombre de disques.
-    source (str): Nom de la tour source.
-    auxiliary (str): Nom de la tour auxiliaire.
-    destination (str): Nom de la tour destination.
+    nb_palet_camera (int): Nombre de disques.
 
     Returns:
-    list of tuple: Une liste de mouvements (numéro_du_disque, tour_depart, tour_arrivee).
+    list of tuple: Liste des mouvements sous la forme 
+                   (numéro_du_coup, axe_d'origine, axe_destination, nb_palets_restants_sur_origine)
     """
-    # Liste des mouvements
     movements = []
+    source, auxiliary, destination = 1, 2, 3
 
-    # Si le nombre de disques est pair, inverser auxiliaire et destination
-    if n % 2 == 0:
+    # Si le nombre de disques est pair, on inverse auxiliaire et destination
+    if nb_palet_camera % 2 == 0:
         auxiliary, destination = destination, auxiliary
 
-    # Initialisation des piles représentant les tours
-    towers = {source: list(reversed(range(1, n + 1))), auxiliary: [], destination: []}
+    # Initialisation des tours
+    towers = {1: list(reversed(range(1, nb_palet_camera + 1))), 2: [], 3: []}
 
-    # Nombre total de mouvements
-    total_moves = (2 ** n) - 1
+    total_moves = (2 ** nb_palet_camera) - 1
 
     for move in range(1, total_moves + 1):
-        # Déterminer les tours entre lesquelles déplacer
         if move % 3 == 1:
             from_tower, to_tower = source, destination
         elif move % 3 == 2:
@@ -33,56 +29,81 @@ def hanoi_iterative(n, source="Source", auxiliary="Auxiliary", destination="Dest
         else:
             from_tower, to_tower = auxiliary, destination
 
-        # Règle pour le déplacement
-        if not towers[to_tower] or (towers[from_tower] and towers[from_tower][-1] < towers[to_tower][-1]):
+        # Gérer le déplacement correct
+        if towers[from_tower]:  # Si la tour d'origine n'est pas vide
             disk = towers[from_tower].pop()
             towers[to_tower].append(disk)
-            movements.append((disk, from_tower, to_tower))
-        else:
+        else:  # Si la tour d'origine est vide, inversion
             disk = towers[to_tower].pop()
             towers[from_tower].append(disk)
-            movements.append((disk, to_tower, from_tower))
+            from_tower, to_tower = to_tower, from_tower  # Correction de l'ordre
+
+        # Ajout du mouvement avec mise à jour du nombre de disques restants
+        movements.append((move, from_tower, to_tower, len(towers[from_tower])))
 
     return movements
 
 
-# Communication avec d'autres modules
-def communicate_with_system(movements, move_disk, camera_check):
+def afficher_mouvements(movements):
     """
-    Communique les mouvements avec le bras robotisé et la caméra.
+    Affiche les mouvements du jeu de Hanoï sous forme de tableau.
 
     Parameters:
-    movements (list of tuple): La séquence des mouvements calculée par l'algorithme.
-    move_disk (function): Fonction pour contrôler le bras robotisé.
-    camera_check (function): Fonction pour vérifier l'état des tours avec la caméra.
+    movements (list): Liste des mouvements sous forme de tuples.
     """
-    for step, (disk, from_tower, to_tower) in enumerate(movements, start=1):
-        print(f"Mouvement {step}: Déplacer le disque {disk} de {from_tower} à {to_tower}")
+    print("\n=== Mouvements du jeu de Hanoï ===")
+    print(f"{'Coup':<6}{'Origine':<8}{'Destination':<12}{'Restants'}")
+    print("-" * 35)
 
-        # Envoyer la commande au bras robotisé
-        move_disk(disk, from_tower, to_tower)
-
-        # Vérifier l'état avec la caméra
-        if not camera_check():
-            print(f"Erreur détectée après le mouvement {step}. Arrêt.")
-            break
+    for move in movements:
+        print(f"{move[0]:<6}{move[1]:<8}{move[2]:<12}{move[3]}")
 
 
-# Simulations des fonctions du bras robotisé et de la caméra
-def move_disk_simulation(disk, from_tower, to_tower):
-    print(f"Bras robotisé : Déplacer le disque {disk} de {from_tower} à {to_tower}")
+# Test avec 5 disques
+if __name__ == "__main__":
+    n_disks = 5
+    result = hanoi_iterative(n_disks)
+
+    afficher_mouvements(result)
 
 
-def camera_check_simulation():
-    print("Caméra : Vérification des tours... OK")
-    return True  # Simule que tout est toujours correct
+def afficher_mouvements(movements):
+    """
+    Affiche les mouvements du jeu de Hanoï sous forme de tableau.
+
+    Parameters:
+    movements (list): Liste des mouvements sous forme de tuples ou dictionnaires.
+    """
+    print("\n=== Mouvements du jeu de Hanoï ===")
+    print(f"{'Coup':<6}{'Origine':<8}{'Destination':<12}{'Restants'}")
+    print("-" * 35)
+
+    for move in movements:
+        if isinstance(move, dict):  # Si format dictionnaire
+            print(f"{move['step']:<6}{move['from']:<8}{move['to']:<12}{move['remaining']}")
+        else:  # Si format tuple
+            print(f"{move[0]:<6}{move[1]:<8}{move[2]:<12}{move[3]}")
+
+# Exemple d'utilisation avec une liste de tuples
+#movements_tuples = [
+#    (1, 1, 3, 2),
+#    (2, 1, 2, 1),
+#    (3, 3, 2, 1),
+#    (4, 1, 3, 0),
+#]
+
+
+
 
 
 # Exemple d'utilisation
 if __name__ == "__main__":
-    # Exemple de résolution pour 3 disques
-    n_disks = 3
-    movements = hanoi_iterative(n_disks)
+    n_disks = 7
+    result = hanoi_iterative(n_disks)
+    
+    # Affichage des mouvements
+    for move in result:
+        #print(move)
 
-    # Lancer la communication avec le système
-    communicate_with_system(movements, move_disk_simulation, camera_check_simulation)
+        afficher_mouvements(movements_tuples)
+        #afficher_mouvements(movements_dicts)
