@@ -29,11 +29,11 @@ def hanoi_iterative(nb_palet_camera):
         else:
             from_tower, to_tower = auxiliary, destination
 
-        # Gérer le déplacement correct
-        if towers[from_tower]:  # Si la tour d'origine n'est pas vide
+        # Vérification des mouvements valides
+        if towers[from_tower] and (not towers[to_tower] or towers[from_tower][-1] < towers[to_tower][-1]):
             disk = towers[from_tower].pop()
             towers[to_tower].append(disk)
-        else:  # Si la tour d'origine est vide, inversion
+        elif towers[to_tower] and (not towers[from_tower] or towers[to_tower][-1] < towers[from_tower][-1]):
             disk = towers[to_tower].pop()
             towers[from_tower].append(disk)
             from_tower, to_tower = to_tower, from_tower  # Correction de l'ordre
@@ -61,49 +61,7 @@ def afficher_mouvements(movements):
 
 # Test avec 5 disques
 if __name__ == "__main__":
-    n_disks = 5
+    n_disks = 4
     result = hanoi_iterative(n_disks)
 
     afficher_mouvements(result)
-
-
-def afficher_mouvements(movements):
-    """
-    Affiche les mouvements du jeu de Hanoï sous forme de tableau.
-
-    Parameters:
-    movements (list): Liste des mouvements sous forme de tuples ou dictionnaires.
-    """
-    print("\n=== Mouvements du jeu de Hanoï ===")
-    print(f"{'Coup':<6}{'Origine':<8}{'Destination':<12}{'Restants'}")
-    print("-" * 35)
-
-    for move in movements:
-        if isinstance(move, dict):  # Si format dictionnaire
-            print(f"{move['step']:<6}{move['from']:<8}{move['to']:<12}{move['remaining']}")
-        else:  # Si format tuple
-            print(f"{move[0]:<6}{move[1]:<8}{move[2]:<12}{move[3]}")
-
-# Exemple d'utilisation avec une liste de tuples
-#movements_tuples = [
-#    (1, 1, 3, 2),
-#    (2, 1, 2, 1),
-#    (3, 3, 2, 1),
-#    (4, 1, 3, 0),
-#]
-
-
-
-
-
-# Exemple d'utilisation
-if __name__ == "__main__":
-    n_disks = 7
-    result = hanoi_iterative(n_disks)
-    
-    # Affichage des mouvements
-    for move in result:
-        #print(move)
-
-        afficher_mouvements(movements_tuples)
-        #afficher_mouvements(movements_dicts)
