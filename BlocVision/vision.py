@@ -153,5 +153,21 @@ def initialize_game(self):
     dpg.start_dearpygui()
     dpg.destroy_context()
 
+
+def display_nb_disques():
+
+    # Capture l'image initiale
+    frame = capture_initial_image()
+    if frame is None:
+        print("Erreur : L'image initiale n'a pas pu être capturée.")
+        return
+
+    # Détecte et classe les disques
+    disques = detect_and_classify_discs(frame)
+    if disques is None:
+        print("Erreur : La détection des disques a échoué.")
+        return
+    
+    return disques
 # Lancer l'initialisation du jeu
 initialize_game()
