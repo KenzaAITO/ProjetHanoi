@@ -3,148 +3,205 @@ import numpy as np
 import time
 import dearpygui.dearpygui as dpg
 
+
+# Parametres pour le traitement des disques
+CIRCULARITY_MIN = 0.8  # Pour definir si une forme est suffisamment ronde
+AREA_MIN = 100         # Taille minimale pour filtrer les petits bruits
+AREA_MAX_RATIO = 1.5   # Facteur pour eliminer les disques disproportionnes
+
+# Variables globales
+
 # Paramètres de marge d'erreur pour la comparaison de taille
 MARGE_ERREUR = 5  # Par exemple 5 pixels
 
 # Variables globales pour stocker les données
+
 detected_discs = []
 detected_frame = None
 
 
-
 def capture_initial_image():
+    """Capture une image brute depuis la camera."""
     cap = cv2.VideoCapture(0)
-    if not cap.isOpened():
-        print("Erreur : La caméra n'a pas pu être ouverte.")
-        return None
 
+    # Attente pour stabiliser la camera
     time.sleep(1)
-    ret, frame = cap.read()
+
+    # Lire plusieurs frames pour une capture stable
+    for _ in range(5):
+        ret, frame = cap.read()
+
 
     if not ret or frame is None:
         print("Erreur : Impossible de capturer l'image.")
         cap.release()
         return None
 
-    # Check for black frame
+    # Verifier si l'image est noire
     if not np.any(frame):
-        print("Erreur : L'image capturée est noire.")
+        print("Erreur : L'image est noire.")
+
         cap.release()
         return None
 
     cap.release()
     return frame
 
-def detect_and_classify_discs(frame):
-    # Convertir en niveaux de gris et appliquer un flou pour réduire le bruit
-    gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-    blurred = cv2.GaussianBlur(gray, (5, 5), 0)
 
-    # Appliquer un seuil adaptatif pour gérer différents niveaux de lumière
-    thresholded = cv2.adaptiveThreshold(blurred, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, 
-                                        cv2.THRESH_BINARY_INV, 11, 2)
-    
-    # Affiche l'image après seuil pour vérifier visuellement
-    cv2.imshow("Image seuil", thresholded)
+def detect_and_classify_discs(frame):
+    """Detecte et valide les disques dans l'image."""
+    cv2.imshow("Etape 0 : Image brut", frame)
+    cv2.waitKey(0)
+    # Conversion en niveaux de gris
+    gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+    cv2.imshow("Etape 1 : Niveaux de gris", gray)
     cv2.waitKey(0)
 
-    # Détecte les contours des disques
+    # Appliquer un flou pour reduire le bruit
+    blurred = cv2.GaussianBlur(gray, (5, 5), 0)
+    cv2.imshow("Etape 2 : Flou applique", blurred)
+    cv2.waitKey(0)
+
+    smoothed = cv2.bilateralFilter(gray, 9, 75, 75)
+    cv2.imshow("Filtre bilateral", smoothed)
+    cv2.waitKey(0)
+
+    # Appliquer un seuil binaire adaptatif
+    thresholded = cv2.adaptiveThreshold(smoothed, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C,
+                                        cv2.THRESH_BINARY_INV, 11, 2)
+    cv2.imshow("Etape 3 : Seuil binaire", thresholded)
+
+    cv2.waitKey(0)
+
+    # Detecter les contours
     contours, _ = cv2.findContours(thresholded, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
-    # Gestion de l'erreur si aucun contour n'est détecté
     if len(contours) == 0:
-        print("Erreur : Aucun contour détecté, veuillez vérifier l'image.")
+        print("Erreur : Aucun contour detecte.")
         return None
 
-    # Stocke les tailles et positions des disques
+    # Visualisation des contours
+    contour_frame = frame.copy()
+    cv2.drawContours(contour_frame, contours, -1, (0, 255, 0), 2)
+    cv2.imshow("Etape 4 : Contours detectes", contour_frame)
+    cv2.waitKey(0)
+
+    # Filtrer les contours pour detecter les disques
     disques = []
+    areas = []
+    valid_contours_frame = frame.copy()
+
     for contour in contours:
-        (x, y), radius = cv2.minEnclosingCircle(contour)
         area = cv2.contourArea(contour)
         perimeter = cv2.arcLength(contour, True)
-        
-        # Filtrer les petits contours (bruit) en définissant une taille minimum raisonnable
-        if area > 100:  # Ajuster cette valeur si nécessaire
-            # Vérifier la circularité du contour
-            if perimeter > 0:  # Éviter la division par zéro
-                circularity = (4 * np.pi * area) / (perimeter ** 2)
-                if circularity > 0.8:  # Seuil pour définir un disque (ajuster si nécessaire)
-                    disques.append((int(radius), (int(x), int(y))))
-                else:
-                    print(f"Contour rejeté (pas assez circulaire) : Circularité = {circularity:.2f}")
+
+        # Filtrer les petits contours
+        if area < AREA_MIN:
+            continue
+
+        # Calculer la circularite
+        if perimeter > 0:
+            circularity = (4 * np.pi * area) / (perimeter ** 2)
+            if circularity > CIRCULARITY_MIN:
+                areas.append(area)
+                (x, y), radius = cv2.minEnclosingCircle(contour)
+                disques.append((int(radius), (int(x), int(y))))
+                # Dessiner les contours valides
+                cv2.drawContours(valid_contours_frame, [contour], -1, (0, 255, 0), 2)
             else:
-                print("Contour rejeté (périmètre nul).")
+                # Dessiner les contours rejetes
+                cv2.drawContours(valid_contours_frame, [contour], -1, (0, 0, 255), 2)
 
-    # Vérifier que des disques sont bien détectés
-    if len(disques) == 0:
-        print("Erreur : Aucun disque détecté après filtrage, vérifiez l'image.")
-        return None
+    # Afficher les contours valides et rejetes
+    cv2.imshow("Etape 5 : Contours valides et rejetes", valid_contours_frame)
+    cv2.waitKey(0)
 
-    # Classer les disques par taille en utilisant une marge d'erreur
+
+    # Trier les disques par rayon
     disques = sorted(disques, key=lambda d: d[0])
-    print("Tailles des disques détectés (triés):", [d[0] for d in disques])
+    print("Disques detectes :", [d[0] for d in disques])
+
+    if len(disques) == 0:
+        print("Erreur : Aucun disque valide detecte.")
+        return None
 
     return disques
 
+
 def display_centers_with_crosses(frame, disques):
+    """Affiche les centres des disques avec des croix."""
+
     # Vérifier que l'image est valide
     if frame is None or not isinstance(frame, np.ndarray):
         print("Erreur : L'image fournie n'est pas valide.")
         return
 
-    # Dessiner les croix sur une copie de l'image pour éviter des modifications non voulues
+    # Dessiner les croix sur une copie de l'image
     frame_copy = frame.copy()
 
+    print(f"Nombre de disques détectés : {len(disques)}")
+
     for radius, (x, y) in disques:
+        print(f"Dessin d'une croix au centre du disque à la position ({x}, {y}) avec un rayon de {radius}")
         # Dessine une croix au centre de chaque disque détecté
         cv2.drawMarker(frame_copy, (x, y), (0, 0, 255), cv2.MARKER_CROSS, markerSize=20, thickness=2)
-
-    # Assurez-vous que les fenêtres OpenCV précédentes sont fermées
-    cv2.destroyAllWindows()
 
     # Afficher l'image avec les croix
     cv2.imshow('Disques avec centres marqués', frame_copy)
     cv2.waitKey(0)
     cv2.destroyAllWindows()
 
-# Interface avec Dear PyGui 2.0.0
+def send_data_to_other_program(number_of_discs):
+    """Fonction simulant l'envoi de données à un autre programme."""
+    print(f"Envoi des données : Nombre de disques = {number_of_discs}")
+
+
 def confirm_detection_callback():
-    global detected_discs, detected_frame
+    """Callback pour confirmer la detection."""
+    global detected_discs
     if detected_discs:
         print("Confirmation acceptée.")
-        display_centers_with_crosses(detected_frame, detected_discs)
+        # Envoyer les données à un autre programme
+        send_data_to_other_program(len(detected_discs))
+
     else:
         print("Aucun disque détecté.")
     dpg.stop_dearpygui()
 
+
 def cancel_detection_callback():
-    print("Confirmation refusée. Relancez l'initialisation.")
+    """Callback pour annuler la detection."""
+    print("Confirmation refusée.")
     dpg.stop_dearpygui()
 
-def initialize_game(self):
+
+def initialize_game():
+    """Lance le programme de vision."""
     global detected_discs, detected_frame
 
-    # Capture l'image initiale
+    # Capture de l'image
+
     frame = capture_initial_image()
     if frame is None:
-        print("Erreur : L'image initiale n'a pas pu être capturée.")
         return
 
-        # Détecte et classe les disques
-        disques = self.detect_and_classify_discs(frame)
-        if disques is None:
-            print("Erreur : La détection des disques a échoué.")
-            return
+    # Detection et classification
+    disques = detect_and_classify_discs(frame)
+    if disques is None:
+        return
 
-    # Si tout est bon, ouvre l'interface graphique pour confirmation
     detected_discs = disques
     detected_frame = frame
 
-    dpg.create_context()
-    dpg.create_viewport(title="Confirmation de détection", width=400, height=200)
+    # Afficher les croix immédiatement
+    display_centers_with_crosses(frame, disques)
 
-    with dpg.window(label="Confirmation de détection", width=400, height=200):
-        dpg.add_text(f"Nous avons détecté {len(disques)} disques. Est-ce correct ?")
+    # Interface utilisateur pour confirmation
+    dpg.create_context()
+    dpg.create_viewport(title="Confirmation de detection", width=400, height=200)
+
+    with dpg.window(label="Confirmation de detection", width=400, height=200):
+        dpg.add_text(f"Nombre de disques detectes : {len(disques)}")
         dpg.add_button(label="Oui", callback=confirm_detection_callback)
         dpg.add_button(label="Non", callback=cancel_detection_callback)
 
@@ -154,20 +211,5 @@ def initialize_game(self):
     dpg.destroy_context()
 
 
-def display_nb_disques():
-
-    # Capture l'image initiale
-    frame = capture_initial_image()
-    if frame is None:
-        print("Erreur : L'image initiale n'a pas pu être capturée.")
-        return
-
-    # Détecte et classe les disques
-    disques = detect_and_classify_discs(frame)
-    if disques is None:
-        print("Erreur : La détection des disques a échoué.")
-        return
-    
-    return disques
-# Lancer l'initialisation du jeu
+# Lancer le programme
 initialize_game()

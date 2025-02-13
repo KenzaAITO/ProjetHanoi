@@ -34,6 +34,7 @@ files = [
 [[package]]
 name = "numpy"
 version = "2.2.2"
+
 description = "Fundamental package for array computing in Python"
 optional = false
 python-versions = ">=3.10"
@@ -97,11 +98,13 @@ files = [
 
 [[package]]
 name = "opencv-python"
+
 version = "4.11.0.86"
 description = "Wrapper package for OpenCV python bindings."
 optional = false
 python-versions = ">=3.6"
 files = [
+
     {file = "opencv-python-4.11.0.86.tar.gz", hash = "sha256:03d60ccae62304860d232272e4a4fda93c39d595780cb40b161b310244b736a4"},
     {file = "opencv_python-4.11.0.86-cp37-abi3-macosx_13_0_arm64.whl", hash = "sha256:432f67c223f1dc2824f5e73cdfcd9db0efc8710647d4e813012195dc9122a52a"},
     {file = "opencv_python-4.11.0.86-cp37-abi3-macosx_13_0_x86_64.whl", hash = "sha256:9d05ef13d23fe97f575153558653e2d6e87103995d54e6a35db3f282fe1f9c66"},
@@ -146,3 +149,4 @@ files = [
 lock-version = "2.0"
 python-versions = "3.10.5"
 content-hash = "06dbb81825d26d367040145f1f33f901bfc4fb10dd80ba9fb3d1e5c684d9ccd9"
+
