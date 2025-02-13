@@ -15,3 +15,7 @@ def main():
 if __name__ == "__main__":
     main()
     
+#TODO: Fonction Déplacer
+#TODO: Fonction 
+#TODO: Généré les données en transit
+#TODO: Généré la liste des mouvements (position)

@@ -5,13 +5,13 @@ import os
 import time
 from DobotControl import DobotControl
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-from BlocVision.vision import Image
+#from BlocVision.vision import Image
 
 class Robot:
     def __init__(self):
         #Initialise le robot en connectant le Dobot et en préparant l'interface image.
         self.dobot = DobotControl()
-        self.image = Image()
+        #self.image = Image()
 
     def execute_init(self):
         
@@ -22,10 +22,13 @@ class Robot:
                 # Mouvement au-dessus de la position
                 if(index == 0):
                     self.dobot.deplacer_vers_colonne_droite()
+                    self.dobot.grab_pallet(5, True)
+                    self.dobot.grab_pallet(5, False)
                 if(index == 1):
-                    self.dobot.deplacer_vers_colonne_centre()
+                    self.dobot.deplacer_vers_colonne_centre(0)
+
                 if(index == 2):
-                    self.dobot.deplacer_vers_colonne_gauche()
+                    self.dobot.deplacer_vers_colonne_gauche(0)
 
                 # Initialisation de l'image si à la première position
                 #if index == 0:
