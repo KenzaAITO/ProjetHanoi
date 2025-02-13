@@ -14,22 +14,21 @@ detected_frame = None
 
 def capture_initial_image():
     cap = cv2.VideoCapture(0)
+    if not cap.isOpened():
+        print("Erreur : La caméra n'a pas pu être ouverte.")
+        return None
 
-    # Attendre un moment pour s'assurer que la caméra est prête
-    time.sleep(1)  # Attendre 1 seconde
-
-    # Lire plusieurs frames pour stabiliser la capture
-    for _ in range(5):
-        ret, frame = cap.read()
+    time.sleep(1)
+    ret, frame = cap.read()
 
     if not ret or frame is None:
-        print("Erreur : Impossible de capturer l'image depuis la caméra.")
+        print("Erreur : Impossible de capturer l'image.")
         cap.release()
         return None
 
-    # Vérifier si l'image est noire
-    if not np.any(frame):  # Vérifie si tous les pixels sont à 0
-        print("Erreur : L'image capturée est noire. Veuillez vérifier la caméra.")
+    # Check for black frame
+    if not np.any(frame):
+        print("Erreur : L'image capturée est noire.")
         cap.release()
         return None
 
@@ -122,7 +121,7 @@ def cancel_detection_callback():
     print("Confirmation refusée. Relancez l'initialisation.")
     dpg.stop_dearpygui()
 
-def initialize_game():
+def initialize_game(self):
     global detected_discs, detected_frame
 
     # Capture l'image initiale
@@ -131,11 +130,11 @@ def initialize_game():
         print("Erreur : L'image initiale n'a pas pu être capturée.")
         return
 
-    # Détecte et classe les disques
-    disques = detect_and_classify_discs(frame)
-    if disques is None:
-        print("Erreur : La détection des disques a échoué.")
-        return
+        # Détecte et classe les disques
+        disques = self.detect_and_classify_discs(frame)
+        if disques is None:
+            print("Erreur : La détection des disques a échoué.")
+            return
 
     # Si tout est bon, ouvre l'interface graphique pour confirmation
     detected_discs = disques

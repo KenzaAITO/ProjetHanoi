@@ -2,8 +2,6 @@
 import sys
 import os
 
-# Ajouter le chemin du dossier contenant DobotDllType.py
-sys.path.append(os.path.join(os.path.dirname(__file__), 'libs'))
 
 import BlocVision.vision as vision
 from BlocVision.vision import initialize_game
@@ -83,3 +81,9 @@ def main():
 
 if __name__ == "__main__":
     main()
+    
+#TODO: Fonction Déplacer
+#TODO: Fonction 
+#TODO: Généré les données en transit
+#TODO: Généré la liste des mouvements (position)
+
