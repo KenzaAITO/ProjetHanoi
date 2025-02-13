@@ -3,12 +3,19 @@ import numpy as np
 import time
 import dearpygui.dearpygui as dpg
 
+
 # Parametres pour le traitement des disques
 CIRCULARITY_MIN = 0.8  # Pour definir si une forme est suffisamment ronde
 AREA_MIN = 100         # Taille minimale pour filtrer les petits bruits
 AREA_MAX_RATIO = 1.5   # Facteur pour eliminer les disques disproportionnes
 
 # Variables globales
+
+# Paramètres de marge d'erreur pour la comparaison de taille
+MARGE_ERREUR = 5  # Par exemple 5 pixels
+
+# Variables globales pour stocker les données
+
 detected_discs = []
 detected_frame = None
 
@@ -24,6 +31,7 @@ def capture_initial_image():
     for _ in range(5):
         ret, frame = cap.read()
 
+
     if not ret or frame is None:
         print("Erreur : Impossible de capturer l'image.")
         cap.release()
@@ -32,6 +40,7 @@ def capture_initial_image():
     # Verifier si l'image est noire
     if not np.any(frame):
         print("Erreur : L'image est noire.")
+
         cap.release()
         return None
 
@@ -61,6 +70,7 @@ def detect_and_classify_discs(frame):
     thresholded = cv2.adaptiveThreshold(smoothed, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C,
                                         cv2.THRESH_BINARY_INV, 11, 2)
     cv2.imshow("Etape 3 : Seuil binaire", thresholded)
+
     cv2.waitKey(0)
 
     # Detecter les contours
@@ -106,6 +116,7 @@ def detect_and_classify_discs(frame):
     cv2.imshow("Etape 5 : Contours valides et rejetes", valid_contours_frame)
     cv2.waitKey(0)
 
+
     # Trier les disques par rayon
     disques = sorted(disques, key=lambda d: d[0])
     print("Disques detectes :", [d[0] for d in disques])
@@ -119,6 +130,7 @@ def detect_and_classify_discs(frame):
 
 def display_centers_with_crosses(frame, disques):
     """Affiche les centres des disques avec des croix."""
+
     # Vérifier que l'image est valide
     if frame is None or not isinstance(frame, np.ndarray):
         print("Erreur : L'image fournie n'est pas valide.")
@@ -128,6 +140,7 @@ def display_centers_with_crosses(frame, disques):
     frame_copy = frame.copy()
 
     print(f"Nombre de disques détectés : {len(disques)}")
+
     for radius, (x, y) in disques:
         print(f"Dessin d'une croix au centre du disque à la position ({x}, {y}) avec un rayon de {radius}")
         # Dessine une croix au centre de chaque disque détecté
@@ -137,7 +150,6 @@ def display_centers_with_crosses(frame, disques):
     cv2.imshow('Disques avec centres marqués', frame_copy)
     cv2.waitKey(0)
     cv2.destroyAllWindows()
-
 
 def send_data_to_other_program(number_of_discs):
     """Fonction simulant l'envoi de données à un autre programme."""
@@ -151,6 +163,7 @@ def confirm_detection_callback():
         print("Confirmation acceptée.")
         # Envoyer les données à un autre programme
         send_data_to_other_program(len(detected_discs))
+
     else:
         print("Aucun disque détecté.")
     dpg.stop_dearpygui()
@@ -167,6 +180,7 @@ def initialize_game():
     global detected_discs, detected_frame
 
     # Capture de l'image
+
     frame = capture_initial_image()
     if frame is None:
         return
