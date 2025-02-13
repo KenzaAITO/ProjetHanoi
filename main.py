@@ -28,10 +28,9 @@ if __name__ == "__main__":
 
 
 import BlocVision.vision as vision            # Importation de la classe Vision
-from BlocVision.vision import initialize_game
 import BlocRobot.InitPos as init              # Importation de la classe Robot
 from BlocAlgo.algo import hanoi_iteratif  # Importation de l'algorithme de la tour de Hanoï
-
+import BlocRobot.DobotControl as robot
 
 def main():
     """
@@ -43,17 +42,19 @@ def main():
     # === 1. INITIALISATION DES COMPOSANTS === 
     print("Initialisation du robot...")
     #robot = Robot()  # Création de l'instance du robot
-    intialisation = init.Robot()
+    init.Robot()
+    #boucle pour afficher que tous est correct 
 
     print("Initialisation de la caméra...")
     #camera = Vision()  # La camera n'a pas encore de classe TO DO 
     #intialisation.init() 
-
-    initialize_game()
+    vision.initialize_game()
 
     # === 2. ACQUISITION DE L'ÉTAT INITIAL ===
     print("Prise de photo pour analyser la tour d'origine...")
-    nb_palet_camera = camera.detecter_nombre_palets()  # Détection du nombre de palets sur l'axe d'origine
+    #vision = vision.capture_initial_image()
+
+    nb_palet_camera = vision.display_nb_disques()
 
     if nb_palet_camera == 0:
         print("Erreur : Aucun palet détecté. Vérifiez la caméra.")
@@ -65,15 +66,18 @@ def main():
     print("Calcul des déplacements...")
     mouvements = hanoi_iteratif(nb_palet_camera)  # Génération de la liste des déplacements
 
-    print(f"{len(mouvements)} déplacements générés.")
+    #print(f"{len(mouvements)} déplacements générés.")
 
     # === 4. EXÉCUTION DES DÉPLACEMENTS PAR LE ROBOT ===
-    for move in mouvements:
-        coup, origine, destination, restants = move
-        print(f"Déplacement {coup}: {origine} → {destination} ({restants} palets restants)")
+    #for move in mouvements:
+        #coup, origine, destination, restants = move
+        #print(f"Déplacement {coup}: {origine} → {destination} ({restants} palets restants)")
         
         # Déplacer le robot en fonction du mouvement généré
-        robot.deplacer(origine, destination)
+
+        #robot.DobotControl.deplacer_vers_colonne_gauche()
+        #robot.DobotControl.deplacer_vers_colonne_droite()
+        #robot.DobotControl.deplacer_vers_colonne_centre()
 
     print("Résolution de la Tour de Hanoï terminée !")
 
