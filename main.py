@@ -46,36 +46,29 @@ def main():
     print("Initialisation de la caméra...")
     #camera = Vision()  # La camera n'a pas encore de classe TO DO 
     #intialisation.init() 
-    vision.initialize_game()
+    #vision.initialize_game()
 
     # === 2. ACQUISITION DE L'ÉTAT INITIAL ===
     print("Prise de photo pour analyser la tour d'origine...")
     #vision = vision.capture_initial_image()
 
-    nb_palet_camera = vision.display_nb_disques()
+    #nb_palet_camera = vision.display_nb_disques()
+    nb_palet_camera = 3
 
     if nb_palet_camera == 0:
         print("Erreur : Aucun palet détecté. Vérifiez la caméra.")
         return
 
-    print(f"Nombre de palets détectés : {nb_palet_camera}")
-
     # === 3. CALCUL DES DÉPLACEMENTS SELON L'ALGORITHME DE HANOÏ ===
-    print("Calcul des déplacements...")
     mouvements = hanoi_iteratif(nb_palet_camera)  # Génération de la liste des déplacements
+    nb_coup=0
+    for mouvements[nb_coup] in range (0,len(mouvements)):
+        robot.deplacer_sur_axe(mouvements[nb_coup])
 
     #print(f"{len(mouvements)} déplacements générés.")
 
     # === 4. EXÉCUTION DES DÉPLACEMENTS PAR LE ROBOT ===
-    #for move in mouvements:
-        #coup, origine, destination, restants = move
-        #print(f"Déplacement {coup}: {origine} → {destination} ({restants} palets restants)")
-        
-        # Déplacer le robot en fonction du mouvement généré
 
-        #robot.DobotControl.deplacer_vers_colonne_gauche()
-        #robot.DobotControl.deplacer_vers_colonne_droite()
-        #robot.DobotControl.deplacer_vers_colonne_centre()
 
     print("Résolution de la Tour de Hanoï terminée !")
 

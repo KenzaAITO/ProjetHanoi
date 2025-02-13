@@ -128,6 +128,24 @@ class DobotControl:
         """Destructeur pour deconnecter proprement."""
         self.disconnect()
 
+    def deplacer_sur_axe(mouvement): #ne recupere qu'une seule ligne de la liste
+
+        print(f"Deplacement du robot : {mouvement}")
+    
+        if(mouvement):
+            coup, origine, destination, restants = mouvement #recupère les parametres de cette ligne
+            print(f"Déplacement {coup}: {origine} → {destination} ({restants} palets restants)")
+        match destination:
+            case 1:
+                deplacer_vers_colonne_droite()
+            case 2:
+                deplacer_vers_colonne_centre()
+            case 3:
+                deplacer_vers_colonne_gauche()
+            case _:
+                return False #erreur
+            
+        return True
 
 # if __name__ == "__main__":
     # try:

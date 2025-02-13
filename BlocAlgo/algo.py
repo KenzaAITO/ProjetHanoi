@@ -39,7 +39,7 @@ def hanoi_iteratif(nb_disques):
         elif tours[destination] and (not tours[origine] or tours[destination][-1] < tours[origine][-1]):
             disque = tours[destination].pop()
             tours[origine].append(disque)
-            origine, destination = destination, origine  # Correction de l'ordre si nécessaire
+            origine, destination = destination, origine 
 
         # Enregistrement du mouvement
         mouvements.append((coup, origine, destination, len(tours[origine])))
