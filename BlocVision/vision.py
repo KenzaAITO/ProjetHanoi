@@ -212,4 +212,4 @@ def initialize_game():
 
 
 # Lancer le programme
-initialize_game()
+#initialize_game()

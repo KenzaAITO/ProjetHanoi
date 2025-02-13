@@ -4,7 +4,7 @@ import sys
 import os
 import time
 from DobotControl import DobotControl
-import dearpygui.dearpygui as dpg
+#import dearpygui.dearpygui as dpg
 
 
 class Robot:
@@ -28,10 +28,6 @@ class Robot:
 
                 if(index == 2):
                     self.dobot.deplacer_vers_colonne_gauche(0)
-
-                # Initialisation de l'image si à la première position
-                #if index == 0:
-                #     self.image.initialize_game()
 
                 # Activer la ventouse pour ramasser
                 self.dobot.activate_ventouse(True)

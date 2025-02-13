@@ -1,34 +1,6 @@
-""" 
-import sys
-import os
-
-
-import BlocVision.vision as vision
-from BlocVision.vision import initialize_game
-import BlocRobot.InitPos as init
-
-def main():
-    print("Program Start:")
-    #partie initialisation 
-    intialisation = init.Robot()
-    #intialisation.init() 
-
-    initialize_game()
-
-    #lancement de l'interface
-    
-
-    
-if __name__ == "__main__":
-    main()
-   """  
-
-
-
 import BlocVision.vision as vision            # Importation de la classe Vision
-import BlocRobot.InitPos as init              # Importation de la classe Robot
 from BlocAlgo.algo import hanoi_iteratif  # Importation de l'algorithme de la tour de Hanoï
-import BlocRobot.DobotControl as robot
+import BlocRobot.DobotControl as dobot
 
 def main():
     """
@@ -39,12 +11,12 @@ def main():
     
     # === 1. INITIALISATION DES COMPOSANTS === 
     print("Initialisation du robot...")
-    #robot = Robot()  # Création de l'instance du robot
-    init.Robot()
-    #boucle pour afficher que tous est correct 
+    robot = dobot.DobotControl()  # Initialisation du robot
+    robot.execute_init()
+    #interface valider disposition palets 
 
     print("Initialisation de la caméra...")
-    #camera = Vision()  # La camera n'a pas encore de classe TO DO 
+    #camera = Vision()  # La camera n'a pas encore de classe TODO 
     #intialisation.init() 
     #vision.initialize_game()
 
@@ -61,13 +33,20 @@ def main():
 
     # === 3. CALCUL DES DÉPLACEMENTS SELON L'ALGORITHME DE HANOÏ ===
     mouvements = hanoi_iteratif(nb_palet_camera)  # Génération de la liste des déplacements
+
+   # === 4. EXÉCUTION DES DÉPLACEMENTS PAR LE ROBOT ===
+
     nb_coup=0
     for mouvements[nb_coup] in range (0,len(mouvements)):
-        robot.deplacer_sur_axe(mouvements[nb_coup])
+        if robot.deplacer_sur_axe(mouvements.index(nb_coup)):
+            nb_coup+=1
+        else:
+            print("Erreur : Déplacement impossible.")
+            raise Exception("Déplacement impossible.")  # TODO : ne pas générer d'exception mais refaire une image
 
     #print(f"{len(mouvements)} déplacements générés.")
 
-    # === 4. EXÉCUTION DES DÉPLACEMENTS PAR LE ROBOT ===
+ 
 
 
     print("Résolution de la Tour de Hanoï terminée !")
