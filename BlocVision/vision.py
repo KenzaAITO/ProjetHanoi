@@ -77,6 +77,7 @@ class CameraProcessor:
         
         for contour in contours:
             if self.classify_contour(contour):
+
                 (x, y), radius = cv2.minEnclosingCircle(contour)
                 disques.append((int(radius), (int(x), int(y))))
                 cv2.drawContours(valid_contours_frame, [contour], -1, (0, 255, 0), 2)
