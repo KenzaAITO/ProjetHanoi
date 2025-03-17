@@ -1,3 +1,5 @@
+
+# genere la matrice que je veux 
 def hanoi_iterative(nb_palet_camera):
     """
     Algorithme itératif pour résoudre la Tour de Hanoï en partant toujours de l'axe 1.
