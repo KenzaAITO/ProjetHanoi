@@ -32,15 +32,11 @@ def main():
     if frame is not None:
         num_discs, _ = processor.detect_discs(frame)
         print(f"Nombre de palets détectés : {num_discs}")
-        # if num_discs == 0:
-        #     print("Erreur : Aucun palet détecté. Vérifiez la caméra.")
-        #     return
     
     #On valide mtn le nombre de palets par l'utilisateur 
     interface = DetectionInterface(num_discs)
     validated_count = interface.show_interface()
 
-    #nb_palet_camera = vision.display_nb_palets()
 
     # === 3. CALCUL DES DÉPLACEMENTS SELON L'ALGORITHME DE HANOÏ ===
     print("Calcul des déplacements...")
