@@ -1,75 +1,74 @@
-import pygame
-import time
+from PyQt6.QtWidgets import QApplication, QWidget, QVBoxLayout, QLabel
+from PyQt6.QtGui import QPainter, QColor, QBrush
+from PyQt6.QtCore import Qt, QTimer
+import sys
 
-class Algorithm:
+class Algorithm(QWidget):
     def __init__(self, n):
-        pygame.init()
+        super().__init__()
         self.n = n
-        self.screen = pygame.display.set_mode((600, 400))
-        self.WHITE = (255, 255, 255)
-        self.BLACK = (0, 0, 0)
-        self.BLUE = (0, 0, 255)
-        
-        self.tower_positions = [(100, 300), (300, 300), (500, 300)]
-        self.palet_widths = [60, 50, 40, 30]
-        
+        self.tower_positions = [100, 300, 500]
+        self.disk_widths = [60, 50, 40, 30]
         self.towers = {0: list(range(1, n + 1)), 1: [], 2: []}
         self.moves = []
-        
         self.hanoi(n, 0, 1, 2)
+        self.index = 0
         
-    def draw_towers(self):
-        for i, pos in enumerate(self.tower_positions):
-            pygame.draw.rect(self.screen, self.BLACK, (pos[0] - 10, 100, 20, 200))
-            pygame.draw.circle(self.screen, self.BLACK, pos, 15)
-
-    def draw_palets(self):
-        for i, tower in self.towers.items():
-            for j, palet in enumerate(tower):
-                palet_index = palet - 1
-                pygame.draw.rect(self.screen, self.BLUE, 
-                                 (self.tower_positions[i][0] - self.palet_widths[palet_index] // 2, 
-                                  280 - j * 20, self.palet_widths[palet_index], 20))
-    
+        self.setWindowTitle("Tower of Hanoi - PyQt6")
+        self.setGeometry(100, 100, 600, 400)
+        
+        self.timer = QTimer(self)
+        self.timer.timeout.connect(self.next_move)
+        self.timer.start(1000)
+        
     def hanoi(self, n, source, auxiliary, destination):
         if n == 1:
-            self.move_palet(source, destination)
+            self.move_disk(source, destination)
             self.moves.append((source, destination))
             return
         self.hanoi(n - 1, source, destination, auxiliary)
-        self.move_palet(source, destination)
+        self.move_disk(source, destination)
         self.moves.append((source, destination))
         self.hanoi(n - 1, auxiliary, source, destination)
     
-    def move_palet(self, source, destination):
+    def move_disk(self, source, destination):
         if self.towers[source]:
-            palet = self.towers[source].pop()
-            self.towers[destination].append(palet)
+            disk = self.towers[source].pop()
+            self.towers[destination].append(disk)
         else:
             print(f"Erreur: Pas de disque à déplacer depuis la tour {source}")
-    
-    def run(self):
-        running = True
-        index = 0
-        while running:
-            self.screen.fill(self.WHITE)
-            self.draw_towers()
-            self.draw_palets()
-            
-            if index < len(self.moves):
-                source, destination = self.moves[index]
-                self.move_palet(source, destination)
-                index += 1
-            
-            pygame.display.flip()
-            time.sleep(1)
-            
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    running = False
         
-        pygame.quit()
+    def next_move(self):
+        if self.index < len(self.moves):
+            source, destination = self.moves[self.index]
+            self.move_disk(source, destination)
+            self.index += 1
+            self.update()
+        else:
+            self.timer.stop()
+        
+    def paintEvent(self, event):
+        painter = QPainter(self)
+        painter.setRenderHint(QPainter.RenderHint.Antialiasing)
+        painter.fillRect(self.rect(), QColor(255, 255, 255))
+        
+        for x in self.tower_positions:
+            painter.setBrush(QBrush(QColor(0, 0, 0)))
+            painter.drawRect(x - 10, 100, 20, 200)
+            painter.drawEllipse(x - 15, 80, 30, 30)
+        
+        for i, tower in self.towers.items():
+            for j, disk in enumerate(tower):
+                disk_index = disk - 1
+                painter.setBrush(QBrush(QColor(0, 0, 255)))
+                painter.drawRect(
+                    self.tower_positions[i] - self.disk_widths[disk_index] // 2, 
+                    280 - j * 20, 
+                    self.disk_widths[disk_index], 20
+                )
 
 if __name__ == "__main__":
-    game = Algorithm(4)
-    game.run()
+    app = QApplication(sys.argv)
+    window = Algorithm(4)
+    window.show()
+    sys.exit(app.exec())
