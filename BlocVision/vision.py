@@ -50,27 +50,27 @@ class CameraProcessor:
         :return: Nombre total de disques détectés, Liste des disques sous la forme [(rayon, (x, y))]
         """
         cv2.imshow("Étape 0 : Image brute", frame)
-        cv2.waitKey(0)
+        cv2.waitKey(1000)
 
         gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
         cv2.imshow("Étape 1 : Conversion en niveaux de gris", gray)
-        cv2.waitKey(0)
+        cv2.waitKey(1000)
 
         blurred = cv2.GaussianBlur(gray, (5, 5), 0)
         cv2.imshow("Étape 2 : Flou gaussien", blurred)
-        cv2.waitKey(0)
+        cv2.waitKey(1000)
 
         thresholded = cv2.adaptiveThreshold(blurred, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C,
                                             cv2.THRESH_BINARY_INV, 11, 2)
         cv2.imshow("Étape 3 : Seuil adaptatif", thresholded)
-        cv2.waitKey(0)
+        cv2.waitKey(1000)
         
         contours, _ = cv2.findContours(thresholded, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
         
         contour_frame = frame.copy()
         cv2.drawContours(contour_frame, contours, -1, (0, 255, 0), 2)
         cv2.imshow("Étape 4 : Contours détectés", contour_frame)
-        cv2.waitKey(0)
+        cv2.waitKey(1000)
 
         disques = []
         valid_contours_frame = frame.copy()
@@ -85,7 +85,7 @@ class CameraProcessor:
                 cv2.drawContours(valid_contours_frame, [contour], -1, (0, 0, 255), 2)
         
         cv2.imshow("Étape 5 : Contours validés et rejetés", valid_contours_frame)
-        cv2.waitKey(0)
+        cv2.waitKey(1000)
         cv2.destroyAllWindows()
 
         disques = sorted(disques, key=lambda d: d[0])
@@ -133,8 +133,14 @@ class DetectionInterface:
 if __name__ == "__main__":
     processor = CameraProcessor()
     frame = processor.capture_image()
+    print(f"Capture image")
     if frame is not None:
-        num_discs, discs = processor.detect_discs(frame)
+        print(f" entrée dans le IF")
+        num_discs = 0 # default value
+        discs = processor.detect_discs(frame)
+        print(f"lancement interface")
+        print(f" nombre de palets: {num_discs}")
         interface = DetectionInterface(num_discs)
         # On considère validated_count comme le chiffre validé par l'user donc à utiliser pour notre jeu
+        print(f"show interface")
         validated_count = interface.show_interface()
