@@ -123,7 +123,7 @@ class DetectionInterface:
             None, "Validation",
             f"Nombre de palets détectés : {self.detected_count}\n"
             "Confirmez ou entrez le nombre correct :",
-            min=0
+            min= self.detected_count
         )
         
         if ok:

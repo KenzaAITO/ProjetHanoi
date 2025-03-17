@@ -16,7 +16,7 @@ def main():
     
     # === 1. INITIALISATION DES COMPOSANTS === 
     print("Initialisation du robot...")
-    robot = Robot()  # Création de l'instance du robot
+    #robot = Robot()  # Création de l'instance du robot
     #init.Robot()
     #boucle pour afficher que tous est correct 
 
@@ -32,14 +32,13 @@ def main():
     if frame is not None:
         num_discs, _ = processor.detect_discs(frame)
         print(f"Nombre de palets détectés : {num_discs}")
-        if num_discs == 0:
-            print("Erreur : Aucun palet détecté. Vérifiez la caméra.")
-            return
+        # if num_discs == 0:
+        #     print("Erreur : Aucun palet détecté. Vérifiez la caméra.")
+        #     return
     
     #On valide mtn le nombre de palets par l'utilisateur 
     interface = DetectionInterface(num_discs)
     validated_count = interface.show_interface()
-    print(f"Nombre de palets détectés : {validated_count}")
 
     #nb_palet_camera = vision.display_nb_palets()
 
