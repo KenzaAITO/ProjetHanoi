@@ -40,6 +40,10 @@ class HanoiIterative:
                 move, from_tower, to_tower, nb_palets_origine_avant, nb_palets_destination_avant
             ))
 
+    def get_move_matrix(self):
+        print(f"selmf move.matrice {self.movements}")
+        return self.movements
+
     def afficher_mouvements(self):
         """
         Affiche les mouvements du jeu de Hanoï sous forme de tableau.
@@ -55,4 +59,5 @@ class HanoiIterative:
 if __name__ == "__main__":
     n_palets = 4
     hanoi = HanoiIterative(n_palets)
+    hanoi.get_move_matrix()
     hanoi.afficher_mouvements()

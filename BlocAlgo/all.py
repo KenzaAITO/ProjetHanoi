@@ -24,7 +24,9 @@ class HanoiAlgorithm:
         self.move_matrix.append((len(self.move_matrix) + 1, source, destination, nb_palets_origine, nb_palets_destination))
     
     def get_move_matrix(self):
+        print(f"selmf move.matrice {self.move_matrix}")
         return self.move_matrix
+
 
 class HanoiSimulation(QWidget):
     def __init__(self, algorithm):

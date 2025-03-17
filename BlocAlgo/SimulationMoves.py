@@ -4,8 +4,8 @@ from PyQt6.QtGui import QPainter, QColor, QBrush
 from PyQt6.QtCore import Qt, QTimer
 
 from BlocAlgo.HanoiIterative import HanoiIterative  # Assuming the correct import
-
 class SimulationMoves(QWidget):
+
     def __init__(self, algorithm):
         super().__init__()
         self.algorithm = algorithm
@@ -13,7 +13,10 @@ class SimulationMoves(QWidget):
         self.palet_widths = [60, 50, 40, 30][:self.algorithm.nb_palet_camera]
         self.towers = {0: list(range(1, self.algorithm.nb_palet_camera + 1)), 1: [], 2: []}
         self.index = 0
-        self.movements = self.algorithm.afficher_mouvements()  # Get the movements from HanoiIterative
+        self.movements = self.algorithm.get_move_matrix()  # Ensure the movements are retrieved properly
+
+        # Debug print to check if movements are correct
+        print("Movements received in simulation:", self.movements)
 
         self.setWindowTitle("Tower of Hanoi - PyQt6")
         self.setGeometry(100, 100, 600, 400)
@@ -38,8 +41,7 @@ class SimulationMoves(QWidget):
             self.update()
         else:
             self.timer.stop()
-            print("Matrice des mouvements:", self.algorithm.move_matrix)
-        
+
     def paintEvent(self, event):
         painter = QPainter(self)
         painter.setRenderHint(QPainter.RenderHint.Antialiasing)
