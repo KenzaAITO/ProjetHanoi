@@ -1,15 +1,36 @@
-import sys
 from PyQt6.QtWidgets import QApplication, QWidget, QVBoxLayout, QLabel
 from PyQt6.QtGui import QPainter, QColor, QBrush
 from PyQt6.QtCore import Qt, QTimer
+import sys
 
-#from BlocAlgo.HanoiAlgorithm import HanoiAlgorithm
-from BlocAlgo.algooo import hanoi_iterative
+class HanoiAlgorithm:
+    def __init__(self, n):
+        self.n = n
+        self.towers = {0: list(range(1, n + 1)), 1: [], 2: []}
+        self.move_matrix = []
+        self.generate_moves(n, 0, 1, 2)
+    
+    def generate_moves(self, n, source, auxiliary, destination):
+        if n == 1:
+            self.record_move(source, destination)
+            return
+        self.generate_moves(n - 1, source, destination, auxiliary)
+        self.record_move(source, destination)
+        self.generate_moves(n - 1, auxiliary, source, destination)
+    
+    def record_move(self, source, destination):
+        nb_palets_origine = len(self.towers[source])
+        nb_palets_destination = len(self.towers[destination])
+        self.move_matrix.append((len(self.move_matrix) + 1, source, destination, nb_palets_origine, nb_palets_destination))
+    
+    def get_move_matrix(self):
+        return self.move_matrix
 
-class SimulationMoves(QWidget):
+class HanoiSimulation(QWidget):
     def __init__(self, algorithm):
         super().__init__()
         self.algorithm = algorithm
+        self.move_matrix = algorithm.get_move_matrix()
         self.tower_positions = [100, 300, 500]
         self.palet_widths = [60, 50, 40, 30][:self.algorithm.n]
         self.towers = {0: list(range(1, self.algorithm.n + 1)), 1: [], 2: []}
@@ -30,14 +51,14 @@ class SimulationMoves(QWidget):
             print(f"Erreur: Pas de disque à déplacer depuis la tour {source}")
         
     def next_move(self):
-        if self.index < len(self.algorithm.moves):
-            source, destination = self.algorithm.moves[self.index]
+        if self.index < len(self.move_matrix):
+            _, source, destination, _, _ = self.move_matrix[self.index]
             self.move_palet(source, destination)
             self.index += 1
             self.update()
         else:
             self.timer.stop()
-            print("Matrice des mouvements:", self.algorithm.move_matrix)
+            print("Matrice des mouvements:", self.move_matrix)
         
     def paintEvent(self, event):
         painter = QPainter(self)
@@ -59,11 +80,9 @@ class SimulationMoves(QWidget):
                     self.palet_widths[palet_index], 20
                 )
 
-
 if __name__ == "__main__":
     app = QApplication(sys.argv)
-    #algorithm = HanoiAlgorithm(4)
-    algorithm = hanoi_iterative(4)
-    window = SimulationMoves(algorithm)
+    algorithm = HanoiAlgorithm(4)
+    window = HanoiSimulation(algorithm)
     window.show()
     sys.exit(app.exec())

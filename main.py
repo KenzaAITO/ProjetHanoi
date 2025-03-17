@@ -3,7 +3,7 @@
 #import BlocRobot.InitPos as init              # Importation de la classe Robot
 
 #from BlocAlgo.algo import hanoi_iteratif  # Importation de l'algorithme de la tour de Hanoï
-from BlocAlgo.algo import Algorithm
+from BlocAlgo.HanoiAlgorithm import Algorithm
 from BlocVision.vision import CameraProcessor, DetectionInterface
 from BlocRobot.DobotControl import DobotControl
 from BlocRobot.InitPos import Robot

@@ -1,8 +1,8 @@
+
 class HanoiAlgorithm:
     def __init__(self, n):
         self.n = n
         self.towers = {0: list(range(1, n + 1)), 1: [], 2: []}
-        self.moves = []
         self.move_matrix = []
         self.generate_moves(n, 0, 1, 2)
     
@@ -17,10 +17,12 @@ class HanoiAlgorithm:
     def record_move(self, source, destination):
         nb_palets_origine = len(self.towers[source])
         nb_palets_destination = len(self.towers[destination])
-        self.moves.append((source, destination))
-        self.move_matrix.append((len(self.moves), source, destination, nb_palets_origine, nb_palets_destination))
+        self.move_matrix.append((len(self.move_matrix) + 1, source, destination, nb_palets_origine, nb_palets_destination))
+    
+    def get_move_matrix(self):
+        return self.move_matrix
 
 
 if __name__ == "__main__":
     algorithm = HanoiAlgorithm(4)
-    matrice = show.algorithm
+    algorithm.get_move_matrix()
