@@ -5,6 +5,7 @@ from PyQt6.QtCore import Qt, QTimer
 
 #from BlocAlgo.HanoiAlgorithm import HanoiAlgorithm
 from BlocAlgo.algooo import hanoi_iterative
+from BlocAlgo.HanoiIterative import HanoiIterative
 
 class SimulationMoves(QWidget):
     def __init__(self, algorithm):
@@ -63,7 +64,8 @@ class SimulationMoves(QWidget):
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     #algorithm = HanoiAlgorithm(4)
-    algorithm = hanoi_iterative(4)
+    #algorithm = hanoi_iterative(4)
+    algorithm = HanoiIterative(4)
     window = SimulationMoves(algorithm)
     window.show()
     sys.exit(app.exec())

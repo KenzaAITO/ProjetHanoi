@@ -22,7 +22,11 @@ class HanoiIterative:
             else:
                 from_tower, to_tower = auxiliary, destination
 
-            # Vérification des mouvements valides
+            # Nombre de palets avant mouvement
+            nb_palets_origine_avant = len(self.towers[from_tower])
+            nb_palets_destination_avant = len(self.towers[to_tower])
+
+            # Vérification et déplacement du disque
             if self.towers[from_tower] and (not self.towers[to_tower] or self.towers[from_tower][-1] < self.towers[to_tower][-1]):
                 palet = self.towers[from_tower].pop()
                 self.towers[to_tower].append(palet)
@@ -31,19 +35,21 @@ class HanoiIterative:
                 self.towers[from_tower].append(palet)
                 from_tower, to_tower = to_tower, from_tower  # Correction de l'ordre
 
-            # Ajout du mouvement avec mise à jour du nombre de disques restants
-            self.movements.append((move, from_tower, to_tower, len(self.towers[from_tower])))
+            # Ajout du mouvement avec les nouvelles colonnes
+            self.movements.append((
+                move, from_tower, to_tower, nb_palets_origine_avant, nb_palets_destination_avant
+            ))
 
     def afficher_mouvements(self):
         """
         Affiche les mouvements du jeu de Hanoï sous forme de tableau.
         """
         print("\n=== Mouvements du jeu de Hanoï ===")
-        print(f"{'Coup':<6}{'Origine':<8}{'Destination':<12}{'Restants'}")
-        print("-" * 35)
+        print(f"{'Coup':<6}{'Origine':<8}{'Destination':<12}{'Palets Org Av':<15}{'Palets Dest Av'}")
+        print("-" * 65)
 
         for move in self.movements:
-            print(f"{move[0]:<6}{move[1]:<8}{move[2]:<12}{move[3]}")
+            print(f"{move[0]:<6}{move[1]:<8}{move[2]:<12}{move[3]:<22}{move[4]}")
 
 # Test avec 4 disques
 if __name__ == "__main__":
