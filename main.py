@@ -2,10 +2,12 @@
 #import BlocRobot.DobotControl as robot
 #import BlocRobot.InitPos as init              # Importation de la classe Robot
 
-from BlocAlgo.algo import hanoi_iteratif  # Importation de l'algorithme de la tour de Hanoï
+#from BlocAlgo.algo import hanoi_iteratif  # Importation de l'algorithme de la tour de Hanoï
+from BlocAlgo.algo import Algorithm
 from BlocVision.vision import CameraProcessor, DetectionInterface
 from BlocRobot.DobotControl import DobotControl
 from BlocRobot.InitPos import Robot
+
 
 def main():
     """
@@ -44,8 +46,8 @@ def main():
 
     # === 3. CALCUL DES DÉPLACEMENTS SELON L'ALGORITHME DE HANOÏ ===
     print("Calcul des déplacements...")
-    mouvements = hanoi_iteratif(validated_count)  # Génération de la liste des déplacements
-
+    #mouvements = hanoi_iteratif(validated_count)  # Génération de la liste des déplacements
+    mouvements = Algorithm(validated_count)
 
     print(f"{len(mouvements)} déplacements générés.")
 
