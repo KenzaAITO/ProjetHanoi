@@ -7,7 +7,7 @@ def hanoi_iteratif(nb_palets):
     
     Retourne :
     list of tuple : Liste des mouvements sous la forme
-                    (numéro_du_coup, axe_d'origine, axe_destination, nb_palets_restants_sur_origine)
+                    (numéro_du_coup, axe_d'origine, axe_destination, nb_palets_restants_sur_origine, nb_palets_restants_sur_destination)
     """
     mouvements = []  # Liste pour enregistrer les mouvements effectués
     source, auxiliaire, destination = 1, 2, 3  # Définition des axes
@@ -32,6 +32,10 @@ def hanoi_iteratif(nb_palets):
         else:
             origine, destination = auxiliaire, destination
 
+        # Calcul du nombre de palets sur les axes d'origine et destination avant le mouvement
+        nb_palets_origine = len(tours[origine])
+        nb_palets_destination = len(tours[destination])
+
         # Vérification avant de déplacer un palet
         if tours[origine] and (not tours[destination] or tours[origine][-1] < tours[destination][-1]):
             palet = tours[origine].pop()
@@ -41,8 +45,8 @@ def hanoi_iteratif(nb_palets):
             tours[origine].append(palet)
             origine, destination = destination, origine  # Correction de l'ordre si nécessaire
 
-        # Enregistrement du mouvement
-        mouvements.append((coup, origine, destination, len(tours[origine])))
+        # Enregistrement du mouvement avec les informations supplémentaires
+        mouvements.append((coup, origine, destination, nb_palets_origine, nb_palets_destination))
 
     return mouvements
 
@@ -55,11 +59,11 @@ def afficher_mouvements(mouvements):
     mouvements (list) : Liste des mouvements sous forme de tuples.
     """
     print("\n=== Mouvements du jeu de Hanoï ===")
-    print(f"{'Coup':<6}{'Origine':<8}{'Destination':<12}{'Restants'}")
-    print("-" * 35)
+    print(f"{'Coup':<6}{'Origine':<8}{'Destination':<12}{'Restants Origine':<18}{'Restants Destination'}")
+    print("-" * 60)
 
     for mouvement in mouvements:
-        print(f"{mouvement[0]:<6}{mouvement[1]:<8}{mouvement[2]:<12}{mouvement[3]}")
+        print(f"{mouvement[0]:<6}{mouvement[1]:<8}{mouvement[2]:<12}{mouvement[3]:<18}{mouvement[4]}")
 
 
 # Test avec 4 palets
