@@ -8,9 +8,10 @@ class Algorithm(QWidget):
         super().__init__()
         self.n = n
         self.tower_positions = [100, 300, 500]
-        self.disk_widths = [60, 50, 40, 30]
+        self.disk_widths = [60, 50, 40, 30][:n]  # Adjust based on n
         self.towers = {0: list(range(1, n + 1)), 1: [], 2: []}
         self.moves = []
+        self.move_matrix = []
         self.hanoi(n, 0, 1, 2)
         self.index = 0
         
@@ -23,13 +24,18 @@ class Algorithm(QWidget):
         
     def hanoi(self, n, source, auxiliary, destination):
         if n == 1:
-            self.move_disk(source, destination)
-            self.moves.append((source, destination))
+            self.record_move(source, destination)
             return
         self.hanoi(n - 1, source, destination, auxiliary)
-        self.move_disk(source, destination)
-        self.moves.append((source, destination))
+        self.record_move(source, destination)
         self.hanoi(n - 1, auxiliary, source, destination)
+    
+    def record_move(self, source, destination):
+        nb_palets_origine = len(self.towers[source])
+        nb_palets_destination = len(self.towers[destination])
+        self.moves.append((source, destination))
+        self.move_matrix.append((len(self.moves), source, destination, nb_palets_origine, nb_palets_destination))
+        self.move_disk(source, destination)
     
     def move_disk(self, source, destination):
         if self.towers[source]:
@@ -46,6 +52,7 @@ class Algorithm(QWidget):
             self.update()
         else:
             self.timer.stop()
+            print("Matrice des mouvements:", self.move_matrix)
         
     def paintEvent(self, event):
         painter = QPainter(self)
