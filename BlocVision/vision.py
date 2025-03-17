@@ -1,8 +1,7 @@
 import cv2
 import numpy as np
 import time
-import tkinter as tk
-from tkinter import simpledialog
+from PyQt6.QtWidgets import QApplication, QInputDialog
 
 # Paramètres pour le traitement des disques
 CIRCULARITY_MIN = 0.8  # Seuil de circularité pour considérer une forme comme un disque
@@ -77,7 +76,6 @@ class CameraProcessor:
         
         for contour in contours:
             if self.classify_contour(contour):
-
                 (x, y), radius = cv2.minEnclosingCircle(contour)
                 disques.append((int(radius), (int(x), int(y))))
                 cv2.drawContours(valid_contours_frame, [contour], -1, (0, 255, 0), 2)
@@ -108,7 +106,8 @@ class CameraProcessor:
 
 class DetectionInterface:
     """
-    Interface utilisateur pour afficher le nombre de disques détectés et permettre la validation ou modification.
+    Interface utilisateur avec PyQt6 pour afficher le nombre de disques détectés
+    et permettre la validation ou modification.
     """
     def __init__(self, detected_count):
         self.detected_count = detected_count
@@ -118,15 +117,20 @@ class DetectionInterface:
         """
         Affiche une boîte de dialogue permettant à l'utilisateur de valider ou modifier le nombre de disques détectés.
         """
-        root = tk.Tk()
-        root.withdraw()  # Cacher la fenêtre principale
+        app = QApplication([])  # Création de l'application PyQt6
 
-        user_input = simpledialog.askinteger("Validation", 
-                                             f"Nombre de disques détectés : {self.detected_count}\n"
-                                             "Confirmez ou entrez le nombre correct :",
-                                             minvalue=0)
+        user_input, ok = QInputDialog.getInt(
+            None, "Validation",
+            f"Nombre de disques détectés : {self.detected_count}\n"
+            "Confirmez ou entrez le nombre correct :",
+            min=0
+        )
         
-        self.validated_count = user_input if user_input is not None else self.detected_count
+        if ok:
+            self.validated_count = user_input
+        else:
+            self.validated_count = self.detected_count
+        
         print(f"Nombre de disques validé par l'utilisateur : {self.validated_count}")
         return self.validated_count
 
@@ -135,12 +139,8 @@ if __name__ == "__main__":
     frame = processor.capture_image()
     print(f"Capture image")
     if frame is not None:
-        print(f" entrée dans le IF")
-        num_discs = 0 # default value
-        discs = processor.detect_discs(frame)
-        print(f"lancement interface")
-        print(f" nombre de palets: {num_discs}")
+        num_discs, _ = processor.detect_discs(frame)
+        print(f"Nombre de palets détectés : {num_discs}")
+
         interface = DetectionInterface(num_discs)
-        # On considère validated_count comme le chiffre validé par l'user donc à utiliser pour notre jeu
-        print(f"show interface")
         validated_count = interface.show_interface()
