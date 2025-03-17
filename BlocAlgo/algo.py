@@ -1,93 +1,73 @@
-import matplotlib.pyplot as plt
-import matplotlib.animation as animation
-import numpy as np
+import pygame
+import time
 
-def hanoi_iteratif(nb_palets):
-    mouvements = []  # Liste pour enregistrer les mouvements effectués
-    source, auxiliaire, destination = 1, 2, 3  # Définition des axes
+# Initialize Pygame
+pygame.init()
 
-    if nb_palets % 2 == 0:
-        auxiliaire, destination = destination, auxiliaire
+# Set up screen and colors
+screen = pygame.display.set_mode((600, 400))
+WHITE = (255, 255, 255)
+BLACK = (0, 0, 0)
+BLUE = (0, 0, 255)
 
-    # Initialisation des tours
-    tours = {1: list(reversed(range(1, nb_palets + 1))), 2: [], 3: []}
+# Tower positions and heights
+tower_positions = [(100, 300), (300, 300), (500, 300)]
+disk_widths = [60, 50, 40, 30]
 
-    total_mouvements = (2 ** nb_palets) - 1
+def draw_towers():
+    for i, pos in enumerate(tower_positions):
+        pygame.draw.rect(screen, BLACK, (tower_positions[i][0] - 10, 100, 20, 200))  # Tower base
+        pygame.draw.circle(screen, BLACK, tower_positions[i], 15)  # Tower top
 
-    for coup in range(1, total_mouvements + 1):
-        if coup % 3 == 1:
-            origine, destination = source, destination
-        elif coup % 3 == 2:
-            origine, destination = source, auxiliaire
-        else:
-            origine, destination = auxiliaire, destination
+def draw_disks(towers):
+    for i, tower in enumerate(towers.values()):  # Corrected this line to access the lists of disks
+        for j, disk in enumerate(tower):
+            pygame.draw.rect(screen, BLUE, (tower_positions[i][0] - disk_widths[disk - 1] // 2, 280 - j * 20,
+                                            disk_widths[disk - 1], 20))
 
-        # Calcul du nombre de palets avant le mouvement
-        nb_palets_origine = len(tours[origine])
-        nb_palets_destination = len(tours[destination])
+def hanoi(n, source, auxiliary, destination, towers, moves):
+    if n == 1:
+        move_disk(source, destination, towers)
+        moves.append((source, destination))
+        return
+    hanoi(n - 1, source, destination, auxiliary, towers, moves)
+    move_disk(source, destination, towers)
+    moves.append((source, destination))
+    hanoi(n - 1, auxiliary, source, destination, towers, moves)
 
-        # Effectuer le mouvement
-        if tours[origine] and (not tours[destination] or tours[origine][-1] < tours[destination][-1]):
-            palet = tours[origine].pop()
-            tours[destination].append(palet)
-        elif tours[destination] and (not tours[origine] or tours[destination][-1] < tours[origine][-1]):
-            palet = tours[destination].pop()
-            tours[origine].append(palet)
-            origine, destination = destination, origine
+def move_disk(source, destination, towers):
+    # Ensure that we pop a disk only if there is one available on the source tower
+    if towers[source]:  # Check if the source tower has disks
+        disk = towers[source].pop()
+        towers[destination].append(disk)
+    else:
+        print(f"Error: No disk to move from tower {source}")
 
-        # Enregistrement du mouvement avec les informations supplémentaires
-        mouvements.append((origine, destination, nb_palets_origine, nb_palets_destination))
+# Number of disks
+n = 4
+towers = {0: list(range(n, 0, -1)), 1: [], 2: []}  # Ensure towers are initialized with lists of disks
+moves = []
 
-    return mouvements
+# Generate moves using the Tower of Hanoi algorithm
+hanoi(n, 0, 1, 2, towers, moves)
 
+# Main loop
+running = True
+index = 0
+while running:
+    screen.fill(WHITE)
+    draw_towers()
+    draw_disks(towers)
+    if index < len(moves):
+        source, destination = moves[index]
+        move_disk(source, destination, towers)
+        index += 1
+    pygame.display.flip()
+    time.sleep(1)  # Wait for 1 second between moves
+    
+    # Check for quit event
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            running = False
 
-def animate_hanoi(mouvements, nb_palets):
-    fig, ax = plt.subplots()
-    ax.set_xlim(0, 4)
-    ax.set_ylim(0, nb_palets + 1)
-    ax.set_xticks([1, 2, 3])
-    ax.set_xticklabels(['Source', 'Auxiliaire', 'Destination'])
-
-    # Initialisation des tours et des palets
-    tours = {1: list(reversed(range(1, nb_palets + 1))), 2: [], 3: []}
-    barres = []
-
-    # Afficher les barres représentant les palets pour chaque tour
-    def update(frame):
-        ax.clear()
-        ax.set_xlim(0, 4)
-        ax.set_ylim(0, nb_palets + 1)
-        ax.set_xticks([1, 2, 3])
-        ax.set_xticklabels(['Source', 'Auxiliaire', 'Destination'])
-
-        # Récupération du mouvement à la frame
-        origine, destination, nb_palets_origine, nb_palets_destination = mouvements[frame]
-
-        # Effectuer le mouvement
-        if tours[origine] and (not tours[destination] or tours[origine][-1] < tours[destination][-1]):
-            palet = tours[origine].pop()
-            tours[destination].append(palet)
-        elif tours[destination] and (not tours[origine] or tours[destination][-1] < tours[origine][-1]):
-            palet = tours[destination].pop()
-            tours[origine].append(palet)
-            origine, destination = destination, origine
-
-        # Afficher les barres représentant les palets
-        for i, (tour, palets) in enumerate(tours.items(), start=1):
-            for j, palet in enumerate(palets):
-                ax.bar(i, palet, width=0.5, bottom=j, color=plt.cm.viridis(palet / nb_palets))
-
-        # Afficher les informations du mouvement actuel
-        ax.text(2, nb_palets + 0.5, f"Déplacement {frame + 1}: Tour {origine} -> Tour {destination}",
-                fontsize=12, ha='center')
-
-        return barres
-
-    ani = animation.FuncAnimation(fig, update, frames=len(mouvements), interval=1000, repeat=False)
-    plt.show()
-
-
-if __name__ == "__main__":
-    n_palets = 4
-    mouvements = hanoi_iteratif(n_palets)
-    animate_hanoi(mouvements, n_palets)
+pygame.quit()
