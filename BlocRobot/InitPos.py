@@ -56,7 +56,7 @@ def display_confirmation():
     dpg.create_viewport(title="Confirmation Enmpalcement robot", width=400, height=200)
 
     with dpg.window(label="Confirmation de détection", width=400, height=200):
-        dpg.add_text(f"Nous avons détecté {len(disques)} disques. Est-ce correct ?")
+        dpg.add_text(f"Nous avons détecté {len(palets)} palets. Est-ce correct ?")
         dpg.add_button(label="Oui", callback=confirm_detection_callback)
         dpg.add_button(label="Non", callback=cancel_detection_callback)
 

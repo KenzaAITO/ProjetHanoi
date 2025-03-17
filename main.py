@@ -52,7 +52,7 @@ def main():
     print("Prise de photo pour analyser la tour d'origine...")
     #vision = vision.capture_initial_image()
 
-    nb_palet_camera = vision.display_nb_disques()
+    nb_palet_camera = vision.display_nb_palets()
 
     if nb_palet_camera == 0:
         print("Erreur : Aucun palet détecté. Vérifiez la caméra.")

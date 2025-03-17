@@ -1,27 +1,27 @@
-def hanoi_iteratif(nb_disques):
+def hanoi_iteratif(nb_palets):
     """
     Algorithme itératif pour résoudre le problème des Tours de Hanoï.
     
     Paramètres :
-    nb_disques (int) : Nombre total de disques à déplacer.
+    nb_palets (int) : Nombre total de palets à déplacer.
     
     Retourne :
     list of tuple : Liste des mouvements sous la forme
-                    (numéro_du_coup, axe_d'origine, axe_destination, nb_disques_restants_sur_origine)
+                    (numéro_du_coup, axe_d'origine, axe_destination, nb_palets_restants_sur_origine)
     """
     mouvements = []  # Liste pour enregistrer les mouvements effectués
     source, auxiliaire, destination = 1, 2, 3  # Définition des axes
 
-    # Si le nombre de disques est pair, on échange les rôles de l'auxiliaire et de la destination
-    if nb_disques % 2 == 0:
+    # Si le nombre de palets est pair, on échange les rôles de l'auxiliaire et de la destination
+    if nb_palets % 2 == 0:
         auxiliaire, destination = destination, auxiliaire
 
     # Initialisation des tours :
-    # - La tour 1 contient tous les disques, du plus grand (en bas) au plus petit (en haut)
+    # - La tour 1 contient tous les palets, du plus grand (en bas) au plus petit (en haut)
     # - Les tours 2 et 3 sont vides au départ
-    tours = {1: list(reversed(range(1, nb_disques + 1))), 2: [], 3: []}
+    tours = {1: list(reversed(range(1, nb_palets + 1))), 2: [], 3: []}
 
-    total_mouvements = (2 ** nb_disques) - 1  # Nombre total de déplacements requis
+    total_mouvements = (2 ** nb_palets) - 1  # Nombre total de déplacements requis
 
     # Boucle principale pour effectuer les déplacements
     for coup in range(1, total_mouvements + 1):
@@ -32,13 +32,13 @@ def hanoi_iteratif(nb_disques):
         else:
             origine, destination = auxiliaire, destination
 
-        # Vérification avant de déplacer un disque
+        # Vérification avant de déplacer un palet
         if tours[origine] and (not tours[destination] or tours[origine][-1] < tours[destination][-1]):
-            disque = tours[origine].pop()
-            tours[destination].append(disque)
+            palet = tours[origine].pop()
+            tours[destination].append(palet)
         elif tours[destination] and (not tours[origine] or tours[destination][-1] < tours[origine][-1]):
-            disque = tours[destination].pop()
-            tours[origine].append(disque)
+            palet = tours[destination].pop()
+            tours[origine].append(palet)
             origine, destination = destination, origine  # Correction de l'ordre si nécessaire
 
         # Enregistrement du mouvement
@@ -62,9 +62,9 @@ def afficher_mouvements(mouvements):
         print(f"{mouvement[0]:<6}{mouvement[1]:<8}{mouvement[2]:<12}{mouvement[3]}")
 
 
-# Test avec 4 disques
+# Test avec 4 palets
 if __name__ == "__main__":
-    n_disques = 4  # Modifier ce nombre pour tester avec plus ou moins de disques
-    resultat = hanoi_iteratif(n_disques)
+    n_palets = 4  # Modifier ce nombre pour tester avec plus ou moins de palets
+    resultat = hanoi_iteratif(n_palets)
 
     afficher_mouvements(resultat)
