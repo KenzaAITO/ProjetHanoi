@@ -1,13 +1,11 @@
-#import BlocVision.vision as vision            # Importation de la classe Vision
-#import BlocRobot.DobotControl as robot
-#import BlocRobot.InitPos as init              # Importation de la classe Robot
+import sys
+from PyQt6.QtWidgets import QApplication
 
-#from BlocAlgo.algo import hanoi_iteratif  # Importation de l'algorithme de la tour de Hanoï
-from BlocAlgo.HanoiAlgorithm import Algorithm
+from BlocAlgo.HanoiIterative import HanoiIterative
 from BlocVision.vision import CameraProcessor, DetectionInterface
 from BlocRobot.DobotControl import DobotControl
 from BlocRobot.InitPos import Robot
-
+from BlocAlgo.SimulationMoves import SimulationMoves
 
 def main():
     """
@@ -47,9 +45,11 @@ def main():
     # === 3. CALCUL DES DÉPLACEMENTS SELON L'ALGORITHME DE HANOÏ ===
     print("Calcul des déplacements...")
     #mouvements = hanoi_iteratif(validated_count)  # Génération de la liste des déplacements
-    mouvements = Algorithm(validated_count)
+    algo = HanoiIterative(validated_count)# print la matrice dans l'init
 
-    print(f"{len(mouvements)} déplacements générés.")
+    app = QApplication(sys.argv)
+    simulation = SimulationMoves(algo)
+    simulation.show()
 
     # === 4. EXÉCUTION DES DÉPLACEMENTS PAR LE ROBOT ===
     #for move in mouvements:
@@ -61,7 +61,8 @@ def main():
         #robot.DobotControl.deplacer_vers_colonne_gauche()
         #robot.DobotControl.deplacer_vers_colonne_droite()
         #robot.DobotControl.deplacer_vers_colonne_centre()
-
+    
+    sys.exit(app.exec())
     print("Résolution de la Tour de Hanoï terminée !")
 
 if __name__ == "__main__":
@@ -69,5 +70,5 @@ if __name__ == "__main__":
     
 #TODO: Fonction Déplacer
 #TODO: Généré les données en transit
-#TODO: Généré la liste des mouvements (position)
+
 

@@ -4,6 +4,7 @@ class HanoiIterative:
         self.movements = []
         self.towers = {1: list(reversed(range(1, nb_palet_camera + 1))), 2: [], 3: []}
         self.solve()
+        self.afficher_mouvements()
 
     def solve(self):
         source, auxiliary, destination = 1, 2, 3
