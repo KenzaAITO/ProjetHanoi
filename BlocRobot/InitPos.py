@@ -3,10 +3,9 @@
 import sys
 import os
 import time
-from DobotControl import DobotControl
+from BlocRobot.DobotControl import DobotControl
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-from BlocVision.vision import Image
-import dearpygui.dearpygui as dpg
+#import dearpygui.dearpygui as dpg
 
 
 class Robot:
@@ -51,21 +50,21 @@ class Robot:
         except Exception as e:
             print(f"Une erreur s'est produite : {e}")
 
-def display_confirmation():
-    dpg.create_context()
-    dpg.create_viewport(title="Confirmation Enmpalcement robot", width=400, height=200)
+# def display_confirmation():
+#     dpg.create_context()
+#     dpg.create_viewport(title="Confirmation Enmpalcement robot", width=400, height=200)
 
-    with dpg.window(label="Confirmation de détection", width=400, height=200):
-        dpg.add_text(f"Nous avons détecté {len(disques)} disques. Est-ce correct ?")
-        dpg.add_button(label="Oui", callback=confirm_detection_callback)
-        dpg.add_button(label="Non", callback=cancel_detection_callback)
+#     with dpg.window(label="Confirmation de détection", width=400, height=200):
+#         dpg.add_text(f"Nous avons détecté {len(palets)} palets. Est-ce correct ?")
+#         dpg.add_button(label="Oui", callback=confirm_detection_callback)
+#         dpg.add_button(label="Non", callback=cancel_detection_callback)
 
-    dpg.setup_dearpygui()
-    dpg.show_viewport()
-    dpg.start_dearpygui()
-    dpg.destroy_context()
+#     dpg.setup_dearpygui()
+#     dpg.show_viewport()
+#     dpg.start_dearpygui()
+#     dpg.destroy_context()
 
-if __name__ == "__main__":
-    robot = Robot()
-    robot.execute_init()
-    robot.dobot.disconnect()
+#if __name__ == "__main__":
+    # robot = Robot()
+    # robot.execute_init()
+    # robot.dobot.disconnect()
