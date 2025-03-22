@@ -3,6 +3,7 @@
 import time
 from serial.tools import list_ports
 import pydobot
+from BlocAlgo.HanoiIterative import HanoiIterative
 
 class DobotControl:
     
@@ -160,31 +161,38 @@ class DobotControl:
         """Destructeur pour deconnecter proprement."""
         self.disconnect()
 
+    def deplacer_vers_axe(self,axe_id):
+        match axe_id:
+            case 1:
+                self.deplacer_vers_colonne_gauche()
+            case 2:
+                self.deplacer_vers_colonne_centre()
+            case 3:
+                self.deplacer_vers_colonne_droite()
+            case _:
+                print(f"Erreur axe_id")
+        
+            
+    def realiser_deplacement(self, origine , destination, palets_origin_before, palets_destination_before):
+        self.deplacer_vers_axe(origine)
+        self.grab_pallet(palets_origin_before, True)
+        self.grab_pallet(palets_destination_before, False)
+        self.deplacer_vers_axe(destination)
 
-# if __name__ == "__main__":
-    # try:
-    #     # Initialisation du contrôleur
-    #     dobot = DobotControl()
+if __name__ == "__main__":
+    print(f"coucou robot")
+    robot = DobotControl()
+    robot.execute_init()
+    
+    hanoi = HanoiIterative(4)  # Initialisation avec 4 disques
+    
+    # Supposons que hanoi.genere_deplacements() retourne une liste de mouvements
+    for mouvement in hanoi.genere_deplacements():  
+        origine, destination, palets_origin_before, palets_destination_before = mouvement
+        robot.realiser_deplacement(origine, destination, palets_origin_before, palets_destination_before)
 
-    #     # Obtenir la position actuelle
-    #     pose = dobot.get_pose()
-
-    #     # Déplacement test
-    #     dobot.move_to(pose[0] + 20, pose[1], pose[2])
-    #     dobot.move_to(pose[0], pose[1], pose[2])
-
-    #     # Activer et désactiver la ventouse
-    #     dobot.activate_ventouse(True)
-    #     time.sleep(2)
-    #     dobot.activate_ventouse(False)
-
-    #     # Retour à la position initiale
-    #     dobot.return_to_home()
-
-    # except Exception as e:
-    #     print(f"Erreur : {e}")
-
-    # finally:
-    #     # Nettoyage final
-    #     if 'dobot' in locals():
-    #         dobot.disconnect()
+#2eme version a test 
+    # Boucle pour exécuter les mouvements de la matrice
+    for coup, origine, destination, palets_origin_before, palets_destination_before in hanoi.move.matrice:
+        print(f"Exécution du déplacement {coup}: {origine} -> {destination}")
+        robot.realiser_deplacement(origine, destination, palets_origin_before, palets_destination_before)
