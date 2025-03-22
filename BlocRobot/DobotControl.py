@@ -180,18 +180,14 @@ class DobotControl:
         self.grab_pallet(palets_destination_before, grab=False)
 
 if __name__ == "__main__":
-    print(f"coucou robot")
     robot = DobotControl()
+    print(f"Phase d'initialisation du robot...")
     robot.execute_init()
     
+    print(f"Phase de résolution de la Tour de Hanoï...")
     hanoi = HanoiIterative(4)  # Initialisation avec 4 disques
-    
-    # Supposons que hanoi.genere_deplacements() retourne une liste de mouvements
-    #for mouvement in hanoi.genere_deplacements():  
-    #    origine, destination, palets_origin_before, palets_destination_before = mouvement
-    #    robot.realiser_deplacement(origine, destination, palets_origin_before, palets_destination_before)
+    hanoi.afficher_mouvements()
 
-#2eme version a test 
     # Boucle pour exécuter les mouvements de la matrice
     for coup, origine, destination, palets_origin_before, palets_destination_before in hanoi.get_move_matrix():
         print(f"Exécution du déplacement {coup}: {origine} -> {destination}")
