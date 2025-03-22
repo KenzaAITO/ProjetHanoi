@@ -169,12 +169,6 @@ class DobotControl:
         self.deplacer_vers_axe(destination)
         self.grab_pallet(palets_destination_before, grab=False)
 
-    def move_vertical(self, nb_palet, r=0, wait=True, grab=True):
-        print(f"Nombre de palets à saisir : {nb_palet}")
-        #Saisir un palet.
-        if(grab == False):
-            nb_palet += 1
-
     def move_vertical_switch(self, nb_palet):
         match nb_palet:
             case 0:
@@ -200,8 +194,6 @@ if __name__ == "__main__":
     
     print(f"Phase de résolution de la Tour de Hanoï...")
     hanoi = HanoiIterative(4)  # Initialisation avec 4 disques
-
-    hanoi.afficher_mouvements()
 
     # Boucle pour exécuter les mouvements de la matrice
     for coup, origine, destination, palets_origin_before, palets_destination_before in hanoi.get_move_matrix():

@@ -29,11 +29,7 @@ class TestRobot:
         robot.disconnect()
 
     def testHauteur():
-        
-
-
-
-
+        print(f"Test de la hauteur")
 
 if __name__ == "__main__":
     test = TestRobot()
