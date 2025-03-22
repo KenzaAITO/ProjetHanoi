@@ -17,12 +17,9 @@ def main():
     # === 1. INITIALISATION DES COMPOSANTS === 
     print("Initialisation du robot...")
     #robot = Robot()  # Création de l'instance du robot
-    #init.Robot()
-    #boucle pour afficher que tous est correct 
+    #robot.execute_init()
 
     print("Initialisation de la caméra...")
-    #intialisation.init() 
-    #vision.initialize_game()
     processor = CameraProcessor()
 
     # === 2. ACQUISITION DE L'ÉTAT INITIAL ===
