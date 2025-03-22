@@ -1,6 +1,6 @@
 import sys
 from PyQt6.QtWidgets import QApplication
-
+import time
 from BlocAlgo.HanoiIterative import HanoiIterative
 from BlocVision.vision import CameraProcessor, DetectionInterface
 from BlocRobot.DobotControl import DobotControl
@@ -30,7 +30,8 @@ def main():
     frame = processor.capture_image()
 
     if frame is not None:
-        num_discs, _ = processor.detect_discs(frame)
+        detection_id = int(time.time())
+        num_discs, _ = processor.detect_discs(frame, detection_id)
         print(f"Nombre de palets détectés : {num_discs}")
     
     #On valide mtn le nombre de palets par l'utilisateur 
