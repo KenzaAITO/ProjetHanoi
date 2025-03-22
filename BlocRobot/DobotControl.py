@@ -3,7 +3,9 @@
 import time
 from serial.tools import list_ports
 import pydobot
+import sys
 from BlocAlgo.HanoiIterative import HanoiIterative
+from BlocRobot.Filter_pydobot import FilterPydobotLogs
 
 class DobotControl:
     
@@ -18,6 +20,8 @@ class DobotControl:
 
         self.port = available_ports[4].device  # Choisir le port approprié
         print(f"Connexion au port : {self.port}")
+        # Appliquer le filtre avant d'initialiser pydobot
+        sys.stdout = FilterPydobotLogs(sys.stdout)
         self.device = pydobot.Dobot(port=self.port, verbose=True)
         self.connected = True
         self.home_x = home_x
@@ -196,6 +200,7 @@ if __name__ == "__main__":
     
     print(f"Phase de résolution de la Tour de Hanoï...")
     hanoi = HanoiIterative(4)  # Initialisation avec 4 disques
+
     hanoi.afficher_mouvements()
 
     # Boucle pour exécuter les mouvements de la matrice
