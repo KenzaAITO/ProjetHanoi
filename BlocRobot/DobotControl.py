@@ -37,8 +37,8 @@ class DobotControl:
                 # Mouvement au-dessus de la position
                 if(index == 0):
                     self.deplacer_vers_colonne_droite()
-                    self.grab_pallet(5, True)
-                    self.grab_pallet(5, False)
+                    self.grab_pallet(5, grab=True)
+                    self.grab_pallet(5, grab=False)
                 if(index == 1):
                     self.deplacer_vers_colonne_centre(0)
                     # Activer la ventouse pour ramasser
@@ -175,9 +175,9 @@ class DobotControl:
             
     def realiser_deplacement(self, origine , destination, palets_origin_before, palets_destination_before):
         self.deplacer_vers_axe(origine)
-        self.grab_pallet(palets_origin_before, True)
-        self.grab_pallet(palets_destination_before, False)
+        self.grab_pallet(palets_origin_before, grab=True)
         self.deplacer_vers_axe(destination)
+        self.grab_pallet(palets_destination_before, grab=False)
 
 if __name__ == "__main__":
     print(f"coucou robot")
@@ -187,12 +187,12 @@ if __name__ == "__main__":
     hanoi = HanoiIterative(4)  # Initialisation avec 4 disques
     
     # Supposons que hanoi.genere_deplacements() retourne une liste de mouvements
-    for mouvement in hanoi.genere_deplacements():  
-        origine, destination, palets_origin_before, palets_destination_before = mouvement
-        robot.realiser_deplacement(origine, destination, palets_origin_before, palets_destination_before)
+    #for mouvement in hanoi.genere_deplacements():  
+    #    origine, destination, palets_origin_before, palets_destination_before = mouvement
+    #    robot.realiser_deplacement(origine, destination, palets_origin_before, palets_destination_before)
 
 #2eme version a test 
     # Boucle pour exécuter les mouvements de la matrice
-    for coup, origine, destination, palets_origin_before, palets_destination_before in hanoi.move.matrice:
+    for coup, origine, destination, palets_origin_before, palets_destination_before in hanoi.get_move_matrix():
         print(f"Exécution du déplacement {coup}: {origine} -> {destination}")
         robot.realiser_deplacement(origine, destination, palets_origin_before, palets_destination_before)
