@@ -3,7 +3,9 @@
 import time
 from serial.tools import list_ports
 import pydobot
+import sys
 from BlocAlgo.HanoiIterative import HanoiIterative
+from BlocRobot.Filter_pydobot import FilterPydobotLogs
 
 class DobotControl:
     
@@ -18,6 +20,8 @@ class DobotControl:
 
         self.port = available_ports[4].device  # Choisir le port approprié
         print(f"Connexion au port : {self.port}")
+        # Appliquer le filtre avant d'initialiser pydobot
+        sys.stdout = FilterPydobotLogs(sys.stdout)
         self.device = pydobot.Dobot(port=self.port, verbose=True)
         self.connected = True
         self.home_x = home_x
@@ -186,12 +190,6 @@ if __name__ == "__main__":
     
     hanoi = HanoiIterative(4)  # Initialisation avec 4 disques
     
-    # Supposons que hanoi.genere_deplacements() retourne une liste de mouvements
-    #for mouvement in hanoi.genere_deplacements():  
-    #    origine, destination, palets_origin_before, palets_destination_before = mouvement
-    #    robot.realiser_deplacement(origine, destination, palets_origin_before, palets_destination_before)
-
-#2eme version a test 
     # Boucle pour exécuter les mouvements de la matrice
     for coup, origine, destination, palets_origin_before, palets_destination_before in hanoi.get_move_matrix():
         print(f"Exécution du déplacement {coup}: {origine} -> {destination}")
