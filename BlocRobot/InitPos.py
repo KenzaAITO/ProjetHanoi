@@ -27,21 +27,19 @@ class Robot:
                     self.dobot.grab_pallet(5, False)
                 if(index == 1):
                     self.dobot.deplacer_vers_colonne_centre(0)
+                    # Activer la ventouse pour ramasser
+                    self.dobot.activate_ventouse(True)
+                    time.sleep(1)
+                    # Désactiver la ventouse pour déposer
+                    self.dobot.activate_ventouse(False)
 
                 if(index == 2):
                     self.dobot.deplacer_vers_colonne_gauche(0)
-
-                # Initialisation de l'image si à la première position
-                #if index == 0:
-                #     self.image.initialize_game()
-
-                # Activer la ventouse pour ramasser
-                self.dobot.activate_ventouse(True)
-
-                time.sleep(1)
-
-                # Désactiver la ventouse pour déposer
-                self.dobot.activate_ventouse(False)
+                    # Activer la ventouse pour ramasser
+                    self.dobot.activate_ventouse(True)
+                    time.sleep(1)
+                    # Désactiver la ventouse pour déposer
+                    self.dobot.activate_ventouse(False)
 
             # Retour au point de départ
             print("Retour au point de départ.")
