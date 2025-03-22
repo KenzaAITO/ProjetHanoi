@@ -2,9 +2,11 @@ import sys
 from PyQt6.QtWidgets import QApplication
 import time
 from BlocAlgo.HanoiIterative import HanoiIterative
+from BlocAlgo.SimulationMoves import SimulationMoves
 from BlocVision.CameraProcessor import CameraProcessor
 from BlocVision.DetectionInterface import DetectionInterface
-from BlocAlgo.SimulationMoves import SimulationMoves
+
+from BlocRobot.DobotControl import DobotControl
 
 def main():
     """
@@ -15,8 +17,8 @@ def main():
     
     # === 1. INITIALISATION DES COMPOSANTS === 
     print("Initialisation du robot...")
-    #robot = DobotControl()  # Création de l'instance du robot
-    #robot.execute_init()
+    robot = DobotControl()  # Création de l'instance du robot
+    robot.execute_init()
 
     print("Initialisation de la caméra...")
     processor = CameraProcessor()
@@ -49,7 +51,7 @@ def main():
     #for move in algo:
        
         # Déplacer le robot en fonction du mouvement généré
-
+        
         #robot.DobotControl.deplacer_vers_colonne_gauche()
         #robot.DobotControl.deplacer_vers_colonne_droite()
         #robot.DobotControl.deplacer_vers_colonne_centre()

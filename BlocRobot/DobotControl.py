@@ -3,6 +3,9 @@
 import time
 from serial.tools import list_ports
 import pydobot
+import sys
+from BlocAlgo.HanoiIterative import HanoiIterative
+from BlocRobot.Filter_pydobot import FilterPydobotLogs
 
 class DobotControl:
     
@@ -17,6 +20,8 @@ class DobotControl:
 
         self.port = available_ports[4].device  # Choisir le port approprié
         print(f"Connexion au port : {self.port}")
+        # Appliquer le filtre avant d'initialiser pydobot
+        sys.stdout = FilterPydobotLogs(sys.stdout)
         self.device = pydobot.Dobot(port=self.port, verbose=True)
         self.connected = True
         self.home_x = home_x
@@ -36,8 +41,8 @@ class DobotControl:
                 # Mouvement au-dessus de la position
                 if(index == 0):
                     self.deplacer_vers_colonne_droite()
-                    self.grab_pallet(5, True)
-                    self.grab_pallet(5, False)
+                    self.grab_pallet(5, grab=True)
+                    self.grab_pallet(5, grab=False)
                 if(index == 1):
                     self.deplacer_vers_colonne_centre(0)
                     # Activer la ventouse pour ramasser
@@ -160,31 +165,32 @@ class DobotControl:
         """Destructeur pour deconnecter proprement."""
         self.disconnect()
 
+    def deplacer_vers_axe(self,axe_id):
+        match axe_id:
+            case 1:
+                self.deplacer_vers_colonne_gauche()
+            case 2:
+                self.deplacer_vers_colonne_centre()
+            case 3:
+                self.deplacer_vers_colonne_droite()
+            case _:
+                print(f"Erreur axe_id")
+        
+            
+    def realiser_deplacement(self, origine , destination, palets_origin_before, palets_destination_before):
+        self.deplacer_vers_axe(origine)
+        self.grab_pallet(palets_origin_before, grab=True)
+        self.deplacer_vers_axe(destination)
+        self.grab_pallet(palets_destination_before, grab=False)
 
-# if __name__ == "__main__":
-    # try:
-    #     # Initialisation du contrôleur
-    #     dobot = DobotControl()
-
-    #     # Obtenir la position actuelle
-    #     pose = dobot.get_pose()
-
-    #     # Déplacement test
-    #     dobot.move_to(pose[0] + 20, pose[1], pose[2])
-    #     dobot.move_to(pose[0], pose[1], pose[2])
-
-    #     # Activer et désactiver la ventouse
-    #     dobot.activate_ventouse(True)
-    #     time.sleep(2)
-    #     dobot.activate_ventouse(False)
-
-    #     # Retour à la position initiale
-    #     dobot.return_to_home()
-
-    # except Exception as e:
-    #     print(f"Erreur : {e}")
-
-    # finally:
-    #     # Nettoyage final
-    #     if 'dobot' in locals():
-    #         dobot.disconnect()
+if __name__ == "__main__":
+    print(f"coucou robot")
+    robot = DobotControl()
+    robot.execute_init()
+    
+    hanoi = HanoiIterative(4)  # Initialisation avec 4 disques
+    
+    # Boucle pour exécuter les mouvements de la matrice
+    for coup, origine, destination, palets_origin_before, palets_destination_before in hanoi.get_move_matrix():
+        print(f"Exécution du déplacement {coup}: {origine} -> {destination}")
+        robot.realiser_deplacement(origine, destination, palets_origin_before, palets_destination_before)
