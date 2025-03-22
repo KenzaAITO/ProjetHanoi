@@ -2,8 +2,8 @@ import sys
 from PyQt6.QtWidgets import QApplication
 import time
 from BlocAlgo.HanoiIterative import HanoiIterative
-from BlocVision.vision import CameraProcessor, DetectionInterface
-from BlocRobot.DobotControl import DobotControl
+from BlocVision.CameraProcessor import CameraProcessor
+from BlocVision.DetectionInterface import DetectionInterface
 from BlocRobot.InitPos import Robot
 from BlocAlgo.SimulationMoves import SimulationMoves
 
@@ -16,8 +16,7 @@ def main():
     
     # === 1. INITIALISATION DES COMPOSANTS === 
     print("Initialisation du robot...")
-    #robot = Robot()  # Création de l'instance du robot
-    #robot.execute_init()
+    robot = Robot()
 
     print("Initialisation de la caméra...")
     processor = CameraProcessor()
@@ -38,18 +37,18 @@ def main():
 
     # === 3. CALCUL DES DÉPLACEMENTS SELON L'ALGORITHME DE HANOÏ ===
     print("Calcul des déplacements...")
-    #mouvements = hanoi_iteratif(validated_count)  # Génération de la liste des déplacements
-    algo = HanoiIterative(validated_count)# print la matrice dans l'init
+    algo = HanoiIterative(validated_count)# Génération de la liste des déplacements
 
+    
+    # === 4. EXECUTION DES DEPLACEMENTS PAR LA SIMULATION ===
     app = QApplication(sys.argv)
     simulation = SimulationMoves(algo)
     simulation.show()
 
     # === 4. EXÉCUTION DES DÉPLACEMENTS PAR LE ROBOT ===
-    #for move in mouvements:
-        #coup, origine, destination, restants = move
-        #print(f"Déplacement {coup}: {origine} → {destination} ({restants} palets restants)")
-        
+
+    #for move in algo:
+       
         # Déplacer le robot en fonction du mouvement généré
 
         #robot.DobotControl.deplacer_vers_colonne_gauche()
@@ -64,5 +63,7 @@ if __name__ == "__main__":
     
 #TODO: Fonction Déplacer
 #TODO: Généré les données en transit
+#TODO: AJOUTER algo deplacement robot
+#TODO: ajout thread simulation/interface + deplacement robot
 
 

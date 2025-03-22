@@ -1,5 +1,5 @@
 from PyQt6.QtWidgets import QApplication, QInputDialog
-from CameraProcessor import CameraProcessor
+from BlocVision.CameraProcessor import CameraProcessor
 
 # Paramètres pour le traitement des palets
 CIRCULARITY_MIN = 0.8  # Seuil de circularité pour considérer une forme comme un palet

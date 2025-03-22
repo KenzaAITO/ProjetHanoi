@@ -2,7 +2,6 @@ import cv2
 import numpy as np
 import time
 import os
-from datetime import datetime
 
 # Paramètres pour le traitement des palets
 CIRCULARITY_MIN = 0.8  # Seuil de circularité pour considérer une forme comme un palet
