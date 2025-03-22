@@ -48,7 +48,7 @@ def main():
 
     # === 4. EXÉCUTION DES DÉPLACEMENTS PAR LE ROBOT ===
 
-    for coup, origine, destination, palets_origin_before, palets_destination_before in hanoi.get_move_matrix():
+    for coup, origine, destination, palets_origin_before, palets_destination_before in algo.get_move_matrix():
         print(f"Exécution du déplacement {coup}: {origine} -> {destination}")
         robot.realiser_deplacement(origine, destination, palets_origin_before, palets_destination_before)
 

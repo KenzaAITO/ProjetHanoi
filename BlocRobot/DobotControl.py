@@ -100,22 +100,8 @@ class DobotControl:
         #Saisir un palet.
         if(grab == False):
             nb_palet += 1;  # Ajout du palet à déposer
-        match nb_palet:
-            case 0:
-                self.cible_z = -80
-            case 1:
-                self.cible_z = -55
-            case 2:
-                self.cible_z = -30
-            case 3:
-                self.cible_z = -5
-            case 4:
-                self.cible_z = 20
-            case 5:
-                self.cible_z = 50
-            case _:
-                raise ValueError(self.ERROR_INVALID_PALLET_COUNT)
-        
+        self.move_vertical_switch(nb_palet)
+
         print(f"Position actuelle : x={self.cible_x}, y={self.cible_y}, z={self.cible_z}, r={r}")
 
         if not self.connected:
@@ -178,6 +164,30 @@ class DobotControl:
         self.grab_pallet(palets_origin_before, grab=True)
         self.deplacer_vers_axe(destination)
         self.grab_pallet(palets_destination_before, grab=False)
+
+    def move_vertical(self, nb_palet, r=0, wait=True, grab=True):
+        print(f"Nombre de palets à saisir : {nb_palet}")
+        #Saisir un palet.
+        if(grab == False):
+            nb_palet += 1
+
+    def move_vertical_switch(self, nb_palet):
+        match nb_palet:
+            case 0:
+                self.cible_z = -80
+            case 1:
+                self.cible_z = -55
+            case 2:
+                self.cible_z = -30
+            case 3:
+                self.cible_z = -5
+            case 4:
+                self.cible_z = 20
+            case 5:
+                self.cible_z = 50
+            case _:
+                raise ValueError(self.ERROR_INVALID_PALLET_COUNT)
+
 
 if __name__ == "__main__":
     robot = DobotControl()
