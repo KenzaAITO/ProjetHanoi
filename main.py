@@ -48,16 +48,16 @@ def main():
 
     # === 4. EXÉCUTION DES DÉPLACEMENTS PAR LE ROBOT ===
 
-    #for move in algo:
-       
-        # Déplacer le robot en fonction du mouvement généré
-        
-        #robot.DobotControl.deplacer_vers_colonne_gauche()
-        #robot.DobotControl.deplacer_vers_colonne_droite()
-        #robot.DobotControl.deplacer_vers_colonne_centre()
+    for coup, origine, destination, palets_origin_before, palets_destination_before in algo.get_move_matrix():
+        print(f"Exécution du déplacement {coup}: {origine} -> {destination}")
+        robot.realiser_deplacement(origine, destination, palets_origin_before, palets_destination_before)
+
     
     sys.exit(app.exec())
     print("Résolution de la Tour de Hanoï terminée !")
+    robot.return_to_home()
+    robot.disconnect()
+    print("Program End.")
 
 if __name__ == "__main__":
     main()
@@ -66,5 +66,6 @@ if __name__ == "__main__":
 #TODO: Généré les données en transit
 #TODO: AJOUTER algo deplacement robot
 #TODO: ajout thread simulation/interface + deplacement robot
-
+#TODO: methode deconnexion camera 
+#TODO: methode deconnexion interface
 

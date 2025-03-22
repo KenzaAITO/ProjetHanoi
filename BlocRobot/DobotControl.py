@@ -104,22 +104,8 @@ class DobotControl:
         #Saisir un palet.
         if(grab == False):
             nb_palet += 1;  # Ajout du palet à déposer
-        match nb_palet:
-            case 0:
-                self.cible_z = -80
-            case 1:
-                self.cible_z = -55
-            case 2:
-                self.cible_z = -30
-            case 3:
-                self.cible_z = -5
-            case 4:
-                self.cible_z = 20
-            case 5:
-                self.cible_z = 50
-            case _:
-                raise ValueError(self.ERROR_INVALID_PALLET_COUNT)
-        
+        self.move_vertical_switch(nb_palet)
+
         print(f"Position actuelle : x={self.cible_x}, y={self.cible_y}, z={self.cible_z}, r={r}")
 
         if not self.connected:
@@ -183,13 +169,40 @@ class DobotControl:
         self.deplacer_vers_axe(destination)
         self.grab_pallet(palets_destination_before, grab=False)
 
+    def move_vertical(self, nb_palet, r=0, wait=True, grab=True):
+        print(f"Nombre de palets à saisir : {nb_palet}")
+        #Saisir un palet.
+        if(grab == False):
+            nb_palet += 1
+
+    def move_vertical_switch(self, nb_palet):
+        match nb_palet:
+            case 0:
+                self.cible_z = -80
+            case 1:
+                self.cible_z = -55
+            case 2:
+                self.cible_z = -30
+            case 3:
+                self.cible_z = -5
+            case 4:
+                self.cible_z = 20
+            case 5:
+                self.cible_z = 50
+            case _:
+                raise ValueError(self.ERROR_INVALID_PALLET_COUNT)
+
+
 if __name__ == "__main__":
-    print(f"coucou robot")
     robot = DobotControl()
+    print(f"Phase d'initialisation du robot...")
     robot.execute_init()
     
+    print(f"Phase de résolution de la Tour de Hanoï...")
     hanoi = HanoiIterative(4)  # Initialisation avec 4 disques
-    
+
+    hanoi.afficher_mouvements()
+
     # Boucle pour exécuter les mouvements de la matrice
     for coup, origine, destination, palets_origin_before, palets_destination_before in hanoi.get_move_matrix():
         print(f"Exécution du déplacement {coup}: {origine} -> {destination}")
