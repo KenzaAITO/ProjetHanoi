@@ -4,7 +4,6 @@ import time
 from serial.tools import list_ports
 import pydobot
 
-
 class DobotControl:
     
     def __init__(self, home_x=220, home_y=0, home_z=100):
@@ -28,6 +27,39 @@ class DobotControl:
         self.cible_z = 0
         self.device.move_to(home_x, home_y, home_z, 0, True)
 
+    def execute_init(self):
+        
+        #Exécute les mouvements et opérations nécessaires pour chaque position définie.
+        try:
+            for index in 0,1,2:
+
+                # Mouvement au-dessus de la position
+                if(index == 0):
+                    self.deplacer_vers_colonne_droite()
+                    self.grab_pallet(5, True)
+                    self.grab_pallet(5, False)
+                if(index == 1):
+                    self.deplacer_vers_colonne_centre(0)
+                    # Activer la ventouse pour ramasser
+                    self.activate_ventouse(True)
+                    time.sleep(1)
+                    # Désactiver la ventouse pour déposer
+                    self.activate_ventouse(False)
+
+                if(index == 2):
+                    self.deplacer_vers_colonne_gauche(0)
+                    # Activer la ventouse pour ramasser
+                    self.activate_ventouse(True)
+                    time.sleep(1)
+                    # Désactiver la ventouse pour déposer
+                    self.activate_ventouse(False)
+
+            # Retour au point de départ
+            print("Retour au point de départ.")
+            self.return_to_home()
+
+        except Exception as e:
+            print(f"Une erreur s'est produite : {e}")
 
     def deplacer_vers_colonne_gauche(self, r=0, wait=True):
         #Déplacement vers une position spécifique.

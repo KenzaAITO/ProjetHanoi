@@ -5,7 +5,6 @@ import os
 import time
 from BlocRobot.DobotControl import DobotControl
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-#import dearpygui.dearpygui as dpg
 
 
 class Robot:

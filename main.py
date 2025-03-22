@@ -4,7 +4,6 @@ import time
 from BlocAlgo.HanoiIterative import HanoiIterative
 from BlocVision.vision import CameraProcessor, DetectionInterface
 from BlocRobot.DobotControl import DobotControl
-from BlocRobot.InitPos import Robot
 from BlocAlgo.SimulationMoves import SimulationMoves
 
 def main():
@@ -16,7 +15,7 @@ def main():
     
     # === 1. INITIALISATION DES COMPOSANTS === 
     print("Initialisation du robot...")
-    #robot = Robot()  # Création de l'instance du robot
+    #robot = DobotControl()  # Création de l'instance du robot
     #robot.execute_init()
 
     print("Initialisation de la caméra...")
