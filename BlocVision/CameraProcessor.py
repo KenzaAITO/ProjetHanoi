@@ -1,6 +1,8 @@
 import cv2
 import numpy as np
 import time
+import os
+from datetime import datetime
 
 # Paramètres pour le traitement des palets
 CIRCULARITY_MIN = 0.8  # Seuil de circularité pour considérer une forme comme un palet
@@ -103,6 +105,21 @@ class CameraProcessor:
         circularity = (4 * np.pi * area) / (perimeter ** 2)
         return circularity > CIRCULARITY_MIN
 
+    def save_detection_images(self, frame, detection_id):
+        """
+        Sauvegarde l'image de la détection dans un dossier spécifique.
+        :param frame: Image capturée
+        :param detection_id: Identifiant unique pour la détection
+        """
+        folder_name = f"detections/detection_{detection_id}"
+        os.makedirs(folder_name, exist_ok=True)
+        
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        file_path = os.path.join(folder_name, f"capture_{timestamp}.png")
+        
+        cv2.imwrite(file_path, frame)
+        print(f"Image sauvegardée : {file_path}")
+
 if __name__ == "__main__":
     processor = CameraProcessor()
     frame = processor.capture_image()
@@ -110,3 +127,4 @@ if __name__ == "__main__":
     if frame is not None:
         num_discs, _ = processor.detect_discs(frame)
         print(f"Nombre de palets détectés : {num_discs}")
+        processor.save_detection_images(frame, int(time.time()))
