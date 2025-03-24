@@ -51,13 +51,12 @@ def main():
     for coup, origine, destination, palets_origin_before, palets_destination_before in algo.get_move_matrix():
         print(f"Exécution du déplacement {coup}: {origine} -> {destination}")
         robot.realiser_deplacement(origine, destination, palets_origin_before, palets_destination_before)
-
-    
-    sys.exit(app.exec())
+        
     print("Résolution de la Tour de Hanoï terminée !")
     robot.return_to_home()
     robot.disconnect()
     print("Program End.")
+    sys.exit(app.exec())
 
 if __name__ == "__main__":
     main()
@@ -68,4 +67,5 @@ if __name__ == "__main__":
 #TODO: ajout thread simulation/interface + deplacement robot
 #TODO: methode deconnexion camera 
 #TODO: methode deconnexion interface
+#TODO: afficher l'etage a lequel il pose le palet et il retire le palet
 
