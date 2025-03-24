@@ -1,6 +1,9 @@
+import time
+
 from PyQt6.QtWidgets import QApplication, QInputDialog
 
 from BlocVision.CameraProcessor import CameraProcessor
+
 
 class DetectionInterface:
     """
@@ -40,7 +43,8 @@ if __name__ == "__main__":
     frame = processor.capture_image()
     print(f"Capture image")
     if frame is not None:
-        num_discs, _ = processor.detect_discs(frame)
+        detection_id = int(time.time())
+        num_discs, _ = processor.detect_discs(frame, detection_id)
         print(f"Nombre de palets détectés : {num_discs}")
 
         interface = DetectionInterface(num_discs)

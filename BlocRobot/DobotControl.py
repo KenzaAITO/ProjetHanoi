@@ -9,16 +9,16 @@ from serial.tools import list_ports
 from BlocAlgo.HanoiIterative import HanoiIterative
 from BlocRobot.Filter_pydobot import FilterPydobotLogs
 
-H_PALET0      = -80
-H_PALET1      = -55
-H_PALET2      = -30
-H_PALET3      = -5
-H_PALET4      = 20
-H_PALET5      = 50
-AXE_DROITE    = 150
-AXE_GAUCHE    = -150
-AXE_CENTRE    = 0
-H_BRAS_LEVE   = 150
+H_PALET0 = -80
+H_PALET1 = -55
+H_PALET2 = -30
+H_PALET3 = -5
+H_PALET4 = 20
+H_PALET5 = 50
+AXE_DROITE = 150
+AXE_GAUCHE = -150
+AXE_CENTRE = 0
+H_BRAS_LEVE = 150
 DIST_COLONNES = 220
 
 

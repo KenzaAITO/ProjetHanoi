@@ -46,8 +46,12 @@ format: ## Run pre-commit hooks
 	@poetry run isort --profile black BlocRobot
 	@poetry run black BlocAlgo
 	@poetry run isort --profile black BlocAlgo
+	@poetry run black BlocInterface
+	@poetry run isort --profile black BlocInterface
 	@poetry run black main.py
 	@poetry run isort --profile black main.py
+	@poetry run black Tests
+	@poetry run isort --profile black Tests
 ##@poetry run pre-commit run -a
 
 sync: ## Merge changes from main branch to your current branch

@@ -36,6 +36,14 @@ installation de poetry
 
 Caméra :
 opencv-python
+numpy 
+
+Robot:
+pydobot
+pyserial
+
+Interface:
+PyQt6
 
 ## Getting Started
 
@@ -64,18 +72,31 @@ opencv-python
 ## Architecture
 
 ```
-uwb_mqtt/
+PROJETHANOI/
 ├── __init__.py
-├── constants.py
-├── data.py
-├── data_raw_distance.py
-├── db/
+├── BlocAlgo/
 │   ├── __init__.py
-│   └── init_db.py
-├── manager.py
-├── mqtt_manager.py
-├── position_calculator.py
-└── visualization.py
+│   └── HanoiIterative.py
+├── BlocRobot/
+│   ├── __init__.py
+│   └── DobotControl.py
+│   └── Filter_pydobot.py
+│   └── requirements.py
+├── BlocVision/
+│   ├── __init__.py
+│   └── DetectionInterface.py
+│   └── SimulationMoves.py
+│   └── requirements.py
+├── BlocVision/
+│   ├── __init__.py
+│   └── CameraProcessor.py
+│   └── requirements.py
+├── Tests/
+│   └── TestRobot.py
+├── detections/
+├── main.py
+├── Makefile
+├── README.md
 ```
 
 ## Structure diagram 

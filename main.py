@@ -4,10 +4,10 @@ import time
 from PyQt6.QtWidgets import QApplication
 
 from BlocAlgo.HanoiIterative import HanoiIterative
-from BlocAlgo.SimulationMoves import SimulationMoves
+from BlocInterface.DetectionInterface import DetectionInterface
+from BlocInterface.SimulationMoves import SimulationMoves
 from BlocRobot.DobotControl import DobotControl
 from BlocVision.CameraProcessor import CameraProcessor
-from BlocVision.DetectionInterface import DetectionInterface
 
 
 def main():
@@ -84,9 +84,11 @@ if __name__ == "__main__":
 # TODO: vision: retirer le bruit sur les images
 # TODO: vision: disier par 2 le compte pour avoir le bon nb de palet
 # TODO: vision: methode deconnexion camera
+# TODO: vision: classe tests
 
 # TODO: interface: methode deconnexion interface
 # TODO: interface: ajouter la simulation à l'interface
+# TODO: interface: classe tests
 
 # TODO: test: Imaginer les tests unitaires
 # TODO: test: Imaginer les tests integrations
