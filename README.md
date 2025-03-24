@@ -35,18 +35,24 @@ installation de poetry
 ## Dependencies
 
 Caméra :
-opencv-python
-numpy 
+- opencv-python
+- numpy 
 
 Robot:
-pydobot
-pyserial
+- pydobot
+- pyserial
 
 Interface:
-PyQt6
+- PyQt6
 
 ## Getting Started
 
+Installer un environnement virtuel ou installer toutes les dependances logiciels en local.
+Nous vous recommandons poetry 
+ ```bash
+    poetry init
+    poetry add requirements.txt 
+```
 ### Setup
 
 
@@ -102,6 +108,44 @@ PROJETHANOI/
 ## Structure diagram 
 
 graph TD;
+    
+    subgraph Vision
+        A[CameraProcessor] -->|Capture image| B[Détection disques]
+        B -->|Envoie nombre disques| C[DetectionInterface]
+    end
+    
+    subgraph Interface Utilisateur
+        C -->|Validation utilisateur| D[Nombre de disques validé]
+    end
+    
+    subgraph Algorithme
+        D -->|Entrée| E[HanoiIterative]
+        E -->|Génère séquence mouvements| F[SimulationMoves]
+    end
+    
+    subgraph Simulation
+        F -->|Affichage visuel| G[Utilisateur]
+    end
+    
+    subgraph Robotique
+        E -->|Liste mouvements| H[DobotControl]
+        H -->|Exécute déplacements| I[Manipulation physique]
+    end
+    
+    subgraph Programme Principal
+        Start((Début)) -->|Init robot| H
+        Start -->|Init caméra| A
+        Start -->|Capture image| A
+        A -->|Analyse tour| B
+        B -->|Vérification utilisateur| C
+        C -->|Confirme disques| D
+        D -->|Lance algorithme| E
+        E -->|Envoie mouvements| F
+        F -->|Affichage simulation| G
+        E -->|Envoie commandes| H
+        H -->|Déplacement terminé| End((Fin))
+    end
+
 
 
 ## Devices
