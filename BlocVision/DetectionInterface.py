@@ -2,11 +2,6 @@ from PyQt6.QtWidgets import QApplication, QInputDialog
 
 from BlocVision.CameraProcessor import CameraProcessor
 
-# Paramètres pour le traitement des palets
-CIRCULARITY_MIN = 0.8  # Seuil de circularité pour considérer une forme comme un palet
-AREA_MIN = 100  # Taille minimale d'un palet pour éviter les faux positifs
-
-
 class DetectionInterface:
     """
     Interface utilisateur avec PyQt6 pour afficher le nombre de palets détectés
