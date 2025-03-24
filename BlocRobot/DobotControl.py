@@ -7,6 +7,17 @@ import sys
 from BlocAlgo.HanoiIterative import HanoiIterative
 from BlocRobot.Filter_pydobot import FilterPydobotLogs
 
+H_PALET0   = -80
+H_PALET1   = -55
+H_PALET2   = -30
+H_PALET3   = -5
+H_PALET4   = 20
+H_PALET5   = 50
+AXE_DROITE = 150
+AXE_GAUCHE = -150
+AXE_CENTRE = 0
+H_BRAS_LEVE = 150
+DIST_COLONNES = 220
 class DobotControl:
     
     def __init__(self, home_x=220, home_y=0, home_z=100):
@@ -27,7 +38,7 @@ class DobotControl:
         self.home_x = home_x
         self.home_y = home_y
         self.home_z = home_z
-        self.cible_x = 220
+        self.cible_x = DIST_COLONNES
         self.cible_y = 0
         self.cible_z = 0
         self.device.move_to(home_x, home_y, home_z, 0, True)
@@ -68,36 +79,36 @@ class DobotControl:
 
     def deplacer_vers_colonne_gauche(self, r=0, wait=True):
         #Déplacement vers une position spécifique.
-        self.cible_x = 220
-        self.cible_y = -150
+        self.cible_x = DIST_COLONNES
+        self.cible_y = AXE_GAUCHE
             
         if not self.connected:
             raise RuntimeError(self.ERROR_NOT_CONNECTED)
 
-        print(f"Déplacement vers x={self.cible_x}, y={150}, z={self.cible_z}, r={r}")
-        self.device.move_to(self.cible_x, self.cible_y, 150, r, wait)
+        print(f"Déplacement vers x={self.cible_x}, y={AXE_GAUCHE}, z={self.cible_z}, r={r}")
+        self.device.move_to(self.cible_x, self.cible_y, H_BRAS_LEVE, r, wait)
 
     def deplacer_vers_colonne_centre(self, r=0, wait=True):
         #Déplacement vers une position spécifique.
-        self.cible_x = 220
-        self.cible_y = 0
+        self.cible_x = DIST_COLONNES
+        self.cible_y = AXE_CENTRE
             
         if not self.connected:
             raise RuntimeError(self.ERROR_NOT_CONNECTED)
 
-        print(f"Déplacement vers x={self.cible_x}, y={150}, z={self.cible_z}, r={r}")
-        self.device.move_to(self.cible_x, self.cible_y, 150, r, wait)
+        print(f"Déplacement vers x={self.cible_x}, y={AXE_CENTRE}, z={self.cible_z}, r={r}")
+        self.device.move_to(self.cible_x, self.cible_y, H_BRAS_LEVE, r, wait)
     
     def deplacer_vers_colonne_droite(self, r=0, wait=True):
         #Déplacement vers une position spécifique.
-        self.cible_x = 220
-        self.cible_y = 150
+        self.cible_x = DIST_COLONNES 
+        self.cible_y = AXE_DROITE 
         
         if not self.connected:
             raise RuntimeError(self.ERROR_NOT_CONNECTED)
 
-        print(f"Déplacement vers x={self.cible_x}, y={150}, z={self.cible_z}, r={r}")
-        self.device.move_to(self.cible_x, self.cible_y, 150, r, wait)
+        print(f"Déplacement vers x={self.cible_x}, y={AXE_DROITE}, z={self.cible_z}, r={r}")
+        self.device.move_to(self.cible_x, self.cible_y, H_BRAS_LEVE, r, wait)
 
     def grab_pallet(self, nb_palet, r=0, wait=True, grab=True):
         print(f"Nombre de palets à saisir : {nb_palet}")
@@ -138,7 +149,7 @@ class DobotControl:
     def return_to_home(self):
         #Retour a la position initiale (home).
         print(f"Retour à la position de depart : x={self.home_x}, y={self.home_y}, z={self.home_z}")
-        self.device.move_to(self.home_x, 150, self.home_z, r=0, wait=True)
+        self.device.move_to(self.home_x, AXE_CENTRE, self.home_z, r=0, wait=True) #axe_centre anciennement 0
 
     def disconnect(self):
         #Deconnexion propre du Dobot.
@@ -172,17 +183,18 @@ class DobotControl:
     def move_vertical_switch(self, nb_palet):
         match nb_palet:
             case 0:
-                self.cible_z = -80
+                print(f"nb palet sur axe 0 \n hauteur = ")
+                self.cible_z = H_PALET0
             case 1:
-                self.cible_z = -55
+                self.cible_z = H_PALET1
             case 2:
-                self.cible_z = -30
+                self.cible_z = H_PALET2
             case 3:
-                self.cible_z = -5
+                self.cible_z = H_PALET3
             case 4:
-                self.cible_z = 20
+                self.cible_z = H_PALET4
             case 5:
-                self.cible_z = 50
+                self.cible_z = H_PALET5
             case _:
                 raise ValueError(self.ERROR_INVALID_PALLET_COUNT)
 

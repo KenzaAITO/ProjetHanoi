@@ -67,8 +67,8 @@ if __name__ == "__main__":
 #TODO: system: ajout thread simulation/interface + deplacement robot
 
 #TODO: robot: afficher l'etage a lequel il pose le palet et il retire le palet
-#TODO: 
-
+#TODO: robot: ajout de trace pour comprendre deplacement hauteur
+#TODO: robot: resoudre pb initialisation et hauteur 
 
 #TODO: vision: retirer le bruit sur les images
 #TODO: vision: disier par 2 le compte pour avoir le bon nb de palet
@@ -76,3 +76,10 @@ if __name__ == "__main__":
     
 #TODO: interface: methode deconnexion interface
 #TODO: interface: ajouter la simulation à l'interface
+    
+#TODO: Imaginer les tests unitaires
+#TODO: Imaginer les tests integrations
+
+#TODO: Conception detaillée
+#TODO: Planning réel
+#TODO: Slides Soutenance
