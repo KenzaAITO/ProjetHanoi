@@ -63,7 +63,7 @@ class CameraProcessor:
                                             cv2.THRESH_BINARY_INV, 11, 2)
         cv2.imwrite(os.path.join(folder_name, "step_3_threshold.png"), thresholded)
         
-        contours, _ = cv2.findContours(thresholded, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
+        contours, _ = cv2.findContours(thresholded, cv2.RETR_CCOMP, cv2.CHAIN_APPROX_SIMPLE)
         
         contour_frame = frame.copy()
         cv2.drawContours(contour_frame, contours, -1, (0, 255, 0), 2)

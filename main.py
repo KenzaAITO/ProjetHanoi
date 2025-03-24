@@ -61,11 +61,18 @@ def main():
 if __name__ == "__main__":
     main()
     
-#TODO: Fonction Déplacer
-#TODO: Généré les données en transit
-#TODO: AJOUTER algo deplacement robot
-#TODO: ajout thread simulation/interface + deplacement robot
-#TODO: methode deconnexion camera 
-#TODO: methode deconnexion interface
-#TODO: afficher l'etage a lequel il pose le palet et il retire le palet
 
+#TODO: algo/Généré les données en transit
+
+#TODO: system: ajout thread simulation/interface + deplacement robot
+
+#TODO: robot: afficher l'etage a lequel il pose le palet et il retire le palet
+#TODO: 
+
+
+#TODO: vision: retirer le bruit sur les images
+#TODO: vision: disier par 2 le compte pour avoir le bon nb de palet
+#TODO: vision: methode deconnexion camera 
+    
+#TODO: interface: methode deconnexion interface
+#TODO: interface: ajouter la simulation à l'interface
