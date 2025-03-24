@@ -24,12 +24,19 @@ class DobotControl:
         sys.stdout = FilterPydobotLogs(sys.stdout)
         self.device = pydobot.Dobot(port=self.port, verbose=True)
         self.connected = True
+        # Cible initiale
         self.home_x = home_x
         self.home_y = home_y
         self.home_z = home_z
         self.cible_x = 220
         self.cible_y = 0
         self.cible_z = 0
+        # Homing + Calibration
+        self.device.home()
+        self.calibrer_hauteur()  # Définir une nouvelle référence Z
+        
+        # Se repositionner à home après calibration
+        self.move_to_and_check(self.home_x, self.home_y, self.home_z)
         self.device.move_to(home_x, home_y, home_z, 0, True)
 
     def execute_init(self):
@@ -66,6 +73,61 @@ class DobotControl:
         except Exception as e:
             print(f"Une erreur s'est produite : {e}")
 
+    def calibrer_hauteur(self, step=5):
+        """
+        Descend progressivement jusqu'à toucher une surface pour calibrer le Z.
+        """
+        if not self.connected:
+            raise RuntimeError(self.ERROR_NOT_CONNECTED)
+
+        print("Début de la calibration en Z...")
+
+        pose = self.get_pose()
+        current_z = pose[2]
+
+        while current_z > -100:  # Limite de sécurité
+            self.device.move_to(pose[0], pose[1], current_z - step, 0, True)
+            time.sleep(0.2)  # Laisser le temps au mouvement
+            
+            new_pose = self.get_pose()
+            current_z = new_pose[2]
+            
+            if self.detect_contact():
+                print(f"Contact détecté à Z={current_z}. Réglage de la référence.")
+                self.home_z = current_z
+                return
+        
+        print("Aucune surface détectée dans la plage définie.")
+
+    def detect_contact(self):
+        """
+        Détecte le contact avec une surface.
+        """
+        pose = self.get_pose()
+        return pose[2] < -90  # Seuil ajustable
+
+    def move_to_and_check(self, x, y, z, r=0, wait=True):
+        """
+        Déplace le Dobot et vérifie la position.
+        """
+        self.device.move_to(x, y, z, r, wait)
+        time.sleep(0.5)
+        
+        pose = self.get_pose()
+        if abs(pose[0] - x) > 2 or abs(pose[1] - y) > 2 or abs(pose[2] - z) > 2:
+            print(f"Déplacement incorrect : attendu ({x}, {y}, {z}), obtenu ({pose[0]}, {pose[1]}, {pose[2]})")
+        else:
+            print("Position correcte.")
+
+    def get_pose(self):
+        """
+        Obtient la position actuelle du Dobot.
+        """
+        if not self.connected:
+            raise RuntimeError(self.ERROR_NOT_CONNECTED)
+
+        return self.device.pose()
+
     def deplacer_vers_colonne_gauche(self, r=0, wait=True):
         #Déplacement vers une position spécifique.
         self.cible_x = 220
@@ -75,7 +137,7 @@ class DobotControl:
             raise RuntimeError(self.ERROR_NOT_CONNECTED)
 
         print(f"Déplacement vers x={self.cible_x}, y={150}, z={self.cible_z}, r={r}")
-        self.device.move_to(self.cible_x, self.cible_y, 150, r, wait)
+        self.move_to_and_check(self.cible_x, self.cible_y, 150, r, wait)
 
     def deplacer_vers_colonne_centre(self, r=0, wait=True):
         #Déplacement vers une position spécifique.
@@ -86,7 +148,7 @@ class DobotControl:
             raise RuntimeError(self.ERROR_NOT_CONNECTED)
 
         print(f"Déplacement vers x={self.cible_x}, y={150}, z={self.cible_z}, r={r}")
-        self.device.move_to(self.cible_x, self.cible_y, 150, r, wait)
+        self.move_to_and_check(self.cible_x, self.cible_y, 150, r, wait)
     
     def deplacer_vers_colonne_droite(self, r=0, wait=True):
         #Déplacement vers une position spécifique.
@@ -97,7 +159,7 @@ class DobotControl:
             raise RuntimeError(self.ERROR_NOT_CONNECTED)
 
         print(f"Déplacement vers x={self.cible_x}, y={150}, z={self.cible_z}, r={r}")
-        self.device.move_to(self.cible_x, self.cible_y, 150, r, wait)
+        self.move_to_and_check(self.cible_x, self.cible_y, 150, r, wait)
 
     def grab_pallet(self, nb_palet, r=0, wait=True, grab=True):
         print(f"Nombre de palets à saisir : {nb_palet}")
@@ -110,13 +172,13 @@ class DobotControl:
 
         if not self.connected:
             raise RuntimeError(self.ERROR_NOT_CONNECTED)
-        self.device.move_to(self.cible_x, self.cible_y, self.cible_z, r, wait)
+        self.move_to_and_check(self.cible_x, self.cible_y, self.cible_z, r, wait)
         self.activate_ventouse(grab)
         if grab:
             print("Palet saisi")
         else:
             print("Palet déposé")
-        self.device.move_to(self.cible_x, self.cible_y, 150, r, wait)
+        self.move_to_and_check(self.cible_x, self.cible_y, 150, r, wait)
 
     def activate_ventouse(self, activate=True):
         #Activer ou désactiver la ventouse.
@@ -138,7 +200,7 @@ class DobotControl:
     def return_to_home(self):
         #Retour a la position initiale (home).
         print(f"Retour à la position de depart : x={self.home_x}, y={self.home_y}, z={self.home_z}")
-        self.device.move_to(self.home_x, 150, self.home_z, r=0, wait=True)
+        self.move_to_and_check(self.home_x, 150, self.home_z, r=0, wait=True)
 
     def disconnect(self):
         #Deconnexion propre du Dobot.
