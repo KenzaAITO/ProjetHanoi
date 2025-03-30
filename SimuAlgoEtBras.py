@@ -15,42 +15,40 @@ class SimuAlgoEtBras(QWidget):
         self.index = 0
         self.movements = self.algorithm.get_move_matrix()
 
-        self.robot_arm_x = 100  # Position du bras en X
-        self.robot_arm_y = 50   # Hauteur du bras
-        self.robot_holding_palet = None  # Palet en cours de déplacement
+        self.robot_arm_x = 100  
+        self.robot_arm_y = 50   
+        self.robot_holding_palet = None  
+        self.last_palet_moved = None  
 
         self.timer = QTimer(self)
         self.timer.timeout.connect(self.next_move)
-        self.timer.start(1000)
+        self.timer.start(3000)  # ⏳ On ralentit à 3 secondes entre chaque mouvement
 
     def move_palet(self, source, destination):
         """Déplace un palet avec animation du bras."""
         if self.towers[source]:
             self.robot_holding_palet = self.towers[source].pop()
+            self.last_palet_moved = self.robot_holding_palet  
             self.robot_arm_x = self.tower_positions[source]
             self.update()
-            QTimer.singleShot(500, lambda: self.descend_arm(destination))  # Animation
+            QTimer.singleShot(1500, lambda: self.descend_arm(destination))  # ⏳ Animation plus lente
 
     def next_move(self):
-        """
-        Exécute le prochain mouvement enregistré dans la solution.
-
-        :return: Aucun (met à jour self.towers et rafraîchit l'affichage).
-        """
+        """Exécute le prochain mouvement de la solution."""
         if self.index < len(self.movements):
-            move_num, source, destination, palets_origin_before, palets_destination_before = self.movements[self.index]
-            self.move_palet(source - 1, destination - 1)  # Ajustement pour indexation zéro
-            print(f"Mouvement {move_num}: Tour {source} → Tour {destination} | Palets avant (Origine: {palets_origin_before}, Destination: {palets_destination_before})")
+            move_num, source, destination, _, _ = self.movements[self.index]
+            self.move_palet(source - 1, destination - 1)  
+            print(f"Mouvement {move_num}: Tour {source} → Tour {destination}")
             self.index += 1
-            self.update()  # Redessiner la fenêtre après chaque mouvement
+            self.update()
         else:
-            self.timer.stop()  # Arrêter le timer une fois tous les mouvements effectués
+            self.timer.stop()
 
     def descend_arm(self, destination):
-        """Fait descendre le bras et relâche le palet."""
+        """Fait descendre le bras lentement et relâche le palet."""
         self.robot_arm_y = 250
         self.update()
-        QTimer.singleShot(500, lambda: self.drop_palet(destination))
+        QTimer.singleShot(1500, lambda: self.drop_palet(destination))  # ⏳ Animation plus lente
 
     def drop_palet(self, destination):
         """Dépose le palet et remonte le bras."""
@@ -61,6 +59,7 @@ class SimuAlgoEtBras(QWidget):
         self.update()
 
     def paintEvent(self, event):
+        """Affiche les tours, les palets et le bras robotique."""
         painter = QPainter(self)
         painter.setRenderHint(QPainter.RenderHint.Antialiasing)
         painter.fillRect(self.rect(), QColor(255, 255, 255))
@@ -73,8 +72,9 @@ class SimuAlgoEtBras(QWidget):
         # Dessiner les palets
         for i, tower in self.towers.items():
             for j, palet in enumerate(tower):
-                painter.setBrush(QBrush(QColor(0, 0, 255)))
-                painter.drawRect(self.tower_positions[i] - self.palet_widths[palet - 1] // 2, 280 - j * 20,
+                painter.setBrush(QBrush(QColor(255, 105, 180) if palet == self.last_palet_moved else QColor(0, 0, 255)))
+                painter.drawRect(self.tower_positions[i] - self.palet_widths[palet - 1] // 2,
+                                 280 - j * 20,
                                  self.palet_widths[palet - 1], 20)
 
         # Dessiner le bras du robot
@@ -90,15 +90,8 @@ class SimuAlgoEtBras(QWidget):
 
 
 if __name__ == "__main__":
-    # Initialisation de l'application PyQt
     app = QApplication(sys.argv)
-
-    # Création de l'algorithme pour la Tour de Hanoï avec 5 palets
     algorithm = HanoiIterative(5)
-
-    # Création et affichage de la fenêtre de simulation
     window = SimuAlgoEtBras(algorithm)
     window.show()
-
-    # Lancer l'application graphique
     sys.exit(app.exec())
