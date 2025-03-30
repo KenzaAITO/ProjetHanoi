@@ -44,7 +44,6 @@ class DobotControl:
         self.device.move_to(home_x, home_y, home_z, 0, True)
 
     def execute_init(self):
-        
         #Exécute les mouvements et opérations nécessaires pour chaque position définie.
         try:
             for index in 0,1,2:
@@ -198,6 +197,12 @@ class DobotControl:
             case _:
                 raise ValueError(self.ERROR_INVALID_PALLET_COUNT)
 
+    def move_to(self, x, y, z, r=0, wait=True):
+        if not self.connected:
+            raise RuntimeError(self.ERROR_NOT_CONNECTED)
+
+        self.device.move_to(x, y, z, r, wait)
+        self.logger.log_movement(x, y, z, r, "move_to")
 
 if __name__ == "__main__":
     robot = DobotControl()
