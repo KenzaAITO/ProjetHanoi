@@ -4,7 +4,7 @@ from PyQt6.QtGui import QPainter, QColor, QBrush
 from PyQt6.QtCore import Qt, QTimer
 from BlocAlgo.HanoiIterative import HanoiIterative
 
-VITESSE_MOVE = 20
+VITESSE_MOVE = 60
 
 class SimuAlgoEtBras(QWidget):
 
@@ -52,9 +52,20 @@ class SimuAlgoEtBras(QWidget):
                 self.movement_stage += 1
 
             elif self.movement_stage == 2:
-                # Étape 3 : Attraper le palet
+                # Étape 3 : Attraper le palet et le retirer de la tour d'origine
                 self.grab_pallet(palets_origin_before, grab=True)
-                self.movement_stage += 1
+
+                # Supprimer le palet de la tour d'origine dès cette étape
+                origin_tower_index = self.tower_positions.index(self.robot_arm_x)
+                if origin_tower_index != -1 and self.towers[origin_tower_index]:
+                    # Retirer le palet de la tour d'origine
+                    removed_palet = self.towers[origin_tower_index].pop()
+                    print(f"Palet {removed_palet} retiré de la tour {origin_tower_index}")
+                else:
+                    print("Erreur : La tour d'origine est vide ou l'index est invalide.")
+
+                self.movement_stage += 1  # Passer à l'étape suivante
+                self.update()
 
             elif self.movement_stage == 3:
                 # Étape 4 : Remonter le bras avec le palet
@@ -71,7 +82,7 @@ class SimuAlgoEtBras(QWidget):
 
             elif self.movement_stage == 5:
                 # Étape 6 : Descendre le bras pour déposer le palet
-                self.robot_arm_y = 250
+                self.robot_arm_y = 250 - len(self.towers[destination - 1]) * 20  # Ajuster la hauteur pour éviter d'empiler un palet plus gros sur un plus petit
                 self.update()
                 self.movement_stage += 1
 
@@ -83,6 +94,13 @@ class SimuAlgoEtBras(QWidget):
             elif self.movement_stage == 7:
                 # Étape 8 : Remonter à la position initiale
                 self.robot_arm_y = 50
+                self.update()
+                self.movement_stage = 0
+                self.index += 1
+                self.current_move = None  # Réinitialiser pour passer au mouvement suivant
+                
+            elif self.movement_stage == 8:
+                # Étape 9 : Mettre à jour les étapes et réinitialiser pour le mouvement suivant
                 self.update()
                 self.movement_stage = 0
                 self.index += 1
@@ -173,3 +191,5 @@ if __name__ == "__main__":
     window = SimuAlgoEtBras(algorithm)
     window.show()
     sys.exit(app.exec())
+
+
