@@ -6,6 +6,8 @@ import pydobot
 import sys
 from BlocAlgo.HanoiIterative import HanoiIterative
 from BlocRobot.Filter_pydobot import FilterPydobotLogs
+import DobotCalibrate as DobotCalibrator
+from PyQt6.QtWidgets import QApplication, QWidget, QVBoxLayout, QPushButton, QLabel
 
 class DobotControl:
     
@@ -31,9 +33,9 @@ class DobotControl:
         self.cible_x = 220
         self.cible_y = 0
         self.cible_z = 0
-        # Homing + Calibration
+        # Va à la position home
         self.device.home()
-        self.calibrer_hauteur()  # Définir une nouvelle référence Z
+        #self.calibrer_hauteur()  # Définir une nouvelle référence Z
         
         # Se repositionner à home après calibration
         self.move_to_and_check(self.home_x, self.home_y, self.home_z)
@@ -162,6 +164,13 @@ class DobotControl:
         self.move_to_and_check(self.cible_x, self.cible_y, 150, r, wait)
 
     def grab_pallet(self, nb_palet, r=0, wait=True, grab=True):
+        """
+        Saisir ou déposer un palet.
+        :param nb_palet: Nombre de palets à saisir ou déposer.
+        :param r: Angle de rotation.
+        :param wait: Attendre la fin du mouvement.
+        :param grab: True pour saisir, False pour déposer.
+        """
         print(f"Nombre de palets à saisir : {nb_palet}")
         #Saisir un palet.
         if(grab == False):
@@ -214,6 +223,10 @@ class DobotControl:
         self.disconnect()
 
     def deplacer_vers_axe(self,axe_id):
+        """
+        Déplace le robot vers l'axe spécifié.
+        axe_id : 1 = gauche, 2 = centre, 3 = droite
+        """
         match axe_id:
             case 1:
                 self.deplacer_vers_colonne_gauche()
@@ -226,6 +239,9 @@ class DobotControl:
         
             
     def realiser_deplacement(self, origine , destination, palets_origin_before, palets_destination_before):
+        """
+        Réalise le déplacement entre deux axes.
+        """
         self.deplacer_vers_axe(origine)
         self.grab_pallet(palets_origin_before, grab=True)
         self.deplacer_vers_axe(destination)
@@ -247,10 +263,20 @@ class DobotControl:
                 self.cible_z = 50
             case _:
                 raise ValueError(self.ERROR_INVALID_PALLET_COUNT)
+            
+    def calibrer_manuellement(self):
+        """
+        Lance la calibration manuelle du robot.
+        """
+        app = QApplication(sys.argv)
+        window = DobotCalibrator(self)
+        window.show()
+        sys.exit(app.exec())
 
 
 if __name__ == "__main__":
     robot = DobotControl()
+    robot.calibrer_manuellement()
     print(f"Phase d'initialisation du robot...")
     robot.execute_init()
     
