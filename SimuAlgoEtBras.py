@@ -4,6 +4,8 @@ from PyQt6.QtGui import QPainter, QColor, QBrush
 from PyQt6.QtCore import Qt, QTimer
 from BlocAlgo.HanoiIterative import HanoiIterative
 
+VITESSE_MOVE = 20
+
 class SimuAlgoEtBras(QWidget):
 
     def __init__(self, algorithm):
@@ -87,12 +89,12 @@ class SimuAlgoEtBras(QWidget):
                 self.current_move = None  # Réinitialiser pour passer au mouvement suivant
 
     def deplacer_vers_axe(self, cible):
-        """Déplace le bras horizontalement de manière progressive."""
+        """Déplace le bras horizontalement de manière progressive, deux fois plus rapide."""
         target_x = self.tower_positions[cible]
-        step = 5 if target_x > self.robot_arm_x else -5  # Réduire l'incrément pour un mouvement plus lent
+        step = VITESSE_MOVE if target_x > self.robot_arm_x else -VITESSE_MOVE  # Doublé la vitesse en passant de 5 à 10
 
         # Si la distance est assez petite, on ajuste directement la position sans incrément
-        if abs(self.robot_arm_x - target_x) <= 5:
+        if abs(self.robot_arm_x - target_x) <= VITESSE_MOVE:
             self.robot_arm_x = target_x
         else:
             self.robot_arm_x += step
