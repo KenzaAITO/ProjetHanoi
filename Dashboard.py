@@ -2,8 +2,10 @@ import sys
 from PyQt6.QtWidgets import QApplication, QMainWindow, QLabel, QVBoxLayout, QWidget, QGraphicsEllipseItem, QGraphicsScene, QGraphicsView
 from PyQt6.QtCore import Qt, QTimer
 from PyQt6.QtGui import QColor  # Ajout de l'import pour QColor
+from PyQt6.QtWidgets import QGraphicsEllipseItem, QGraphicsScene, QGraphicsTextItem
+from PyQt6.QtCore import QRectF
 
-class Dashboard(QMainWindow):
+class Dashboard(QWidget):
     def __init__(self):
         super().__init__()
 
@@ -27,26 +29,29 @@ class Dashboard(QMainWindow):
         # Canvas pour la lumière (Ventouse)
         self.grab_light_view = QGraphicsView(self)
         self.scene = QGraphicsScene(self)
-        self.grab_light = QGraphicsEllipseItem(0, 0, 20, 20)
-        self.grab_light.setBrush(QColor("red"))  # Utilisation de QColor pour la couleur rouge (OFF)
+        
+        self.view = QGraphicsView(self.scene)
+        self.setLayout(QVBoxLayout())
+        self.layout().addWidget(self.view)
+
+        # Create a circle item
+        self.grab_light = QGraphicsEllipseItem(0, 0, 50, 50)  # A circle representing the light
+        self.grab_light.setBrush(Qt.GlobalColor.red)  # Default to red (off state)
         self.scene.addItem(self.grab_light)
-        self.grab_light_view.setScene(self.scene)
-        layout.addWidget(self.grab_light_view)
 
-        # Conteneur principal
-        container = QWidget(self)
-        container.setLayout(layout)
-        self.setCentralWidget(container)
+        # Create a text item to display status
+        self.grab_text = QGraphicsTextItem("🔴")  # Default text for "off" state
+        self.grab_text.setPos(60, 10)  # Positioning the text next to the circle
+        self.scene.addItem(self.grab_text)
 
-        # Timer pour simuler le changement d'état à chaque coup
-        self.timer = QTimer(self)
-        self.timer.timeout.connect(self.update_dashboard)
-        self.timer.start(1000)  # Met à jour chaque seconde pour la démo
-        # Variables pour l'état de la ventouse et du coup en cours
-        self.grab_on = False
-        self.current_move = None
-        self.pick_height = 0
-        self.drop_height = 0
+    def update_grab_state(self, grab_on):
+        """Updates the grab state light and text"""
+        if grab_on:
+            self.grab_light.setBrush(Qt.GlobalColor.green)  # Green for 'on'
+            self.grab_text.setPlainText("🟢")  # Change text to green
+        else:
+            self.grab_light.setBrush(Qt.GlobalColor.red)  # Red for 'off'
+            self.grab_text.setPlainText("🔴")  # Change text to red
 
     def update_grab_light(self, grab_on):
         """Met à jour la couleur de la lumière en fonction de l'état de la ventouse."""
@@ -80,14 +85,6 @@ class Dashboard(QMainWindow):
         # Exemple de mise à jour des hauteurs pour le test
         self.update_height(self.pick_height, self.drop_height)
 
-    def update_grab_state(self, grab_on):
-        """Met à jour la couleur de la ventouse."""
-        if grab_on:
-            self.grab_light.setText("🟢")  # Vert pour 'on'
-            self.grab_state_label.setText("Ventouse (Grab): On")
-        else:
-            self.grab_light.setText("🔴")  # Rouge pour 'off'
-            self.grab_state_label.setText("Ventouse (Grab): Off")
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     dashboard = Dashboard()

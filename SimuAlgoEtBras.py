@@ -56,6 +56,9 @@ class SimuAlgoEtBras(QMainWindow):
         self.dash_thread.setDaemon(True)  # Ferme ce thread lorsque le programme principal se termine
         self.dash_thread.start()
 
+        # Dash Callback Setup
+        self.setup_callbacks()
+
     def create_dash_layout(self):
         """Crée la mise en page du tableau de bord Dash"""
         return html.Div([
@@ -76,15 +79,28 @@ class SimuAlgoEtBras(QMainWindow):
             html.Div([
                 html.Label("Hauteurs du bras:"),
                 html.Div([
-                    html.Label(f"Hauteur de prise: {self.pick_height}"),
-                    html.Label(f"Hauteur de dépose: {self.drop_height}")
+                    html.Label(id='pick-height', children=f"Hauteur de prise: {self.pick_height}"),
+                    html.Label(id='drop-height', children=f"Hauteur de dépose: {self.drop_height}")
                 ])
-            ])
+            ]),
         ])
 
     def run_dash_server(self):
         """Lance le serveur Dash dans un thread séparé"""
         self.dash_app.run_server(debug=True, use_reloader=False)
+
+    def setup_callbacks(self):
+        """Configure les callbacks Dash"""
+        @self.dash_app.callback(
+            [Output('current-move', 'value'),
+             Output('grab-state', 'value'),
+             Output('pick-height', 'children'),
+             Output('drop-height', 'children')],
+            [Input('grab-state', 'value')]  # you can also set up other inputs if necessary
+        )
+        def update_dashboard(grab_state_value):
+            """Callback to update dashboard elements based on simulation data"""
+            return self.current_move, ['active'] if self.grab_on else [], f"Hauteur de prise: {self.pick_height}", f"Hauteur de dépose: {self.drop_height}"
 
     def execute_next_step(self):
         """Exécute chaque étape d'un déplacement progressivement."""
@@ -165,16 +181,11 @@ class SimuAlgoEtBras(QMainWindow):
         """Met à jour l'interface Dash et le tableau de bord PyQt"""
         # Mettre à jour les éléments Dash avec les nouvelles informations de simulation
         self.dash_app.layout = self.create_dash_layout()
-        self.dash_app.layout.children[1].children[0].value = self.current_move
-        self.dash_app.layout.children[2].children[0].value = ['active'] if self.grab_on else []
-        self.dash_app.layout.children[3].children[0].children[0].children[0] = f"Hauteur de prise: {self.pick_height}"
-        self.dash_app.layout.children[3].children[0].children[1].children[0] = f"Hauteur de dépose: {self.drop_height}"
 
         # Mise à jour du tableau de bord PyQt
         self.dashboard.update_grab_state(self.grab_on)
         self.dashboard.update_current_move(self.current_move)
         self.dashboard.update_height(self.pick_height, self.drop_height)
-
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
