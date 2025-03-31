@@ -4,7 +4,7 @@ from PyQt6.QtGui import QPainter, QColor, QBrush
 from PyQt6.QtCore import Qt, QTimer
 from BlocAlgo.HanoiIterative import HanoiIterative
 
-VITESSE_MOVE = 60
+VITESSE_MOVE = 80
 
 class SimuAlgoEtBras(QWidget):
 
@@ -93,7 +93,18 @@ class SimuAlgoEtBras(QWidget):
             elif self.movement_stage == 6:
                 # Étape 7 : Déposer le palet
                 print(f"Avant dépôt : Tour destination ({destination}) - Palets avant : {palets_destination_before}")
-                self.grab_pallet(palets_destination_before, grab=False)  # Déposer le palet dans la tour de destination
+                # Ajouter le dernier palet déplacé sur la tour de destination
+                self.towers[destination - 1].append(self.robot_holding_palet)  # Déposer le palet dans la destination
+                print(f"Palet {self.robot_holding_palet} déplacé vers la tour {destination - 1}")
+
+                # Une fois le palet déposé, on conserve ce palet comme "dernier déplacé"
+                self.last_palet = self.robot_holding_palet  # Garder une référence du dernier palet déplacé
+
+                # Mettre à jour la variable `highlighted_palet` pour marquer le palet qui sera coloré
+                self.highlighted_palet = self.robot_holding_palet  # Ce palet sera coloré pendant le tour suivant
+
+                # Réinitialisation après le déplacement
+                self.robot_holding_palet = None
                 self.movement_stage += 1
 
             elif self.movement_stage == 7:
@@ -107,9 +118,35 @@ class SimuAlgoEtBras(QWidget):
             elif self.movement_stage == 8:
                 # Étape 9 : Mettre à jour les étapes et réinitialiser pour le mouvement suivant
                 self.update()
+
+                # Afficher le palet déplacé avec une couleur différente pour le tour suivant
+                if self.highlighted_palet:
+                    print(f"Palet {self.highlighted_palet} est maintenant visible en couleur différente")
+                    # Logic to change color here, for example:
+                    self.change_palet_color(self.highlighted_palet, "pink")  # Change couleur à rose
+
+                    # Après un tour, réinitialiser la couleur
+                    self.highlighted_palet = None
+
                 self.movement_stage = 0
                 self.index += 1
                 self.current_move = None  # Réinitialiser pour passer au mouvement suivant
+
+    def change_palet_color(self, palet, color):
+        """Change la couleur d'un palet."""
+        # Exemple de code pour changer la couleur d'un palet, selon sa position dans les tours
+        if palet in self.towers[0]:
+            # Code pour changer la couleur du palet sur la tour 0
+            print(f"Palet {palet} coloré en {color} sur la tour 0")
+            # Mettez à jour l'affichage graphique ici, pour l'affichage réel
+        elif palet in self.towers[1]:
+            # Code pour changer la couleur du palet sur la tour 1
+            print(f"Palet {palet} coloré en {color} sur la tour 1")
+            # Mettez à jour l'affichage graphique ici
+        elif palet in self.towers[2]:
+            # Code pour changer la couleur du palet sur la tour 2
+            print(f"Palet {palet} coloré en {color} sur la tour 2")
+            # Mettez à jour l'affichage graphique ici
 
     def deplacer_vers_axe(self, cible):
         """Déplace le bras horizontalement de manière progressive, deux fois plus rapide."""
