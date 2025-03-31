@@ -53,23 +53,26 @@ class SimuAlgoEtBras(QWidget):
 
             elif self.movement_stage == 2:
                 # Étape 3 : Attraper le palet et le retirer de la tour d'origine
-                self.grab_pallet(palets_origin_before, grab=True)
+                print(f"Avant attraper : Tour origine ({origine}) - Palets avant : {palets_origin_before}")
 
-                # Supprimer le palet de la tour d'origine dès cette étape
+                # Suppression du palet de la tour d'origine ici, avant de "attraper" le palet
                 origin_tower_index = self.tower_positions.index(self.robot_arm_x)
                 if origin_tower_index != -1 and self.towers[origin_tower_index]:
-                    # Retirer le palet de la tour d'origine
-                    removed_palet = self.towers[origin_tower_index].pop()
+                    # Identifier le palet à retirer
+                    removed_palet = self.towers[origin_tower_index].pop()  # Retirer le dernier palet de la tour
                     print(f"Palet {removed_palet} retiré de la tour {origin_tower_index}")
+                    
+                    # Garder la taille inchangée pendant ce processus
+                    self.robot_holding_palet = removed_palet  # On garde ce palet en mémoire pour le déplacer
                 else:
                     print("Erreur : La tour d'origine est vide ou l'index est invalide.")
-
+                
                 self.movement_stage += 1  # Passer à l'étape suivante
                 self.update()
 
             elif self.movement_stage == 3:
-                # Étape 4 : Remonter le bras avec le palet
-                self.robot_arm_y = 50
+                # Étape 4 : Remonter le bras avec le palet (la taille du palet reste inchangée)
+                self.robot_arm_y = 50  # Remonter avec le palet
                 self.update()
                 self.movement_stage += 1
 
@@ -82,13 +85,15 @@ class SimuAlgoEtBras(QWidget):
 
             elif self.movement_stage == 5:
                 # Étape 6 : Descendre le bras pour déposer le palet
-                self.robot_arm_y = 250 - len(self.towers[destination - 1]) * 20  # Ajuster la hauteur pour éviter d'empiler un palet plus gros sur un plus petit
+                # La hauteur ne modifie pas la taille du palet
+                self.robot_arm_y = 250 - len(self.towers[destination - 1]) * 20  # Ajuster la hauteur mais pas la taille du palet
                 self.update()
                 self.movement_stage += 1
 
             elif self.movement_stage == 6:
                 # Étape 7 : Déposer le palet
-                self.grab_pallet(palets_destination_before, grab=False)
+                print(f"Avant dépôt : Tour destination ({destination}) - Palets avant : {palets_destination_before}")
+                self.grab_pallet(palets_destination_before, grab=False)  # Déposer le palet dans la tour de destination
                 self.movement_stage += 1
 
             elif self.movement_stage == 7:
@@ -98,7 +103,7 @@ class SimuAlgoEtBras(QWidget):
                 self.movement_stage = 0
                 self.index += 1
                 self.current_move = None  # Réinitialiser pour passer au mouvement suivant
-                
+
             elif self.movement_stage == 8:
                 # Étape 9 : Mettre à jour les étapes et réinitialiser pour le mouvement suivant
                 self.update()
