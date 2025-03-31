@@ -19,43 +19,116 @@ class SimuAlgoEtBras(QWidget):
         self.robot_arm_y = 50   
         self.robot_holding_palet = None  
         self.last_palet_moved = None  
+        self.movement_stage = 0  # Nouvelle variable pour gérer les étapes du déplacement
+        self.current_move = None  
 
         self.timer = QTimer(self)
-        self.timer.timeout.connect(self.next_move)
-        self.timer.start(3000)  # ⏳ On ralentit à 3 secondes entre chaque mouvement
+        self.timer.timeout.connect(self.execute_next_step)
+        self.timer.start(500)  # ⏳ Ralentir encore plus le bras, passage à 0.5s entre chaque mini-mouvement
 
-    def move_palet(self, source, destination):
-        """Déplace un palet avec animation du bras."""
-        if self.towers[source]:
-            self.robot_holding_palet = self.towers[source].pop()
-            self.last_palet_moved = self.robot_holding_palet  
-            self.robot_arm_x = self.tower_positions[source]
-            self.update()
-            QTimer.singleShot(1500, lambda: self.descend_arm(destination))  # ⏳ Animation plus lente
+    def execute_next_step(self):
+        """Exécute chaque étape d'un déplacement progressivement."""
+        if self.current_move is None and self.index < len(self.movements):
+            # Récupérer le prochain mouvement
+            self.current_move = self.movements[self.index]
+            self.movement_stage = 0  # Recommencer l'animation à l'étape 0
 
-    def next_move(self):
-        """Exécute le prochain mouvement de la solution."""
-        if self.index < len(self.movements):
-            move_num, source, destination, _, _ = self.movements[self.index]
-            self.move_palet(source - 1, destination - 1)  
-            print(f"Mouvement {move_num}: Tour {source} → Tour {destination}")
-            self.index += 1
-            self.update()
+        if self.current_move:
+            move_num, origine, destination, palets_origin_before, palets_destination_before = self.current_move
+
+            if self.movement_stage == 0:
+                # Étape 1 : Se déplacer horizontalement vers la tour d'origine
+                self.deplacer_vers_axe(origine - 1)
+                self.movement_stage += 1
+
+            elif self.movement_stage == 1:
+                # Étape 2 : Descendre pour attraper le palet
+                self.robot_arm_y = 250
+                self.update()
+                self.movement_stage += 1
+
+            elif self.movement_stage == 2:
+                # Étape 3 : Attraper le palet et le retirer de la tour d'origine
+                self.grab_pallet(palets_origin_before, grab=True)
+                self.movement_stage += 1
+
+            elif self.movement_stage == 3:
+                # Étape 4 : Remonter le bras avec le palet
+                self.robot_arm_y = 50
+                self.update()
+                self.movement_stage += 1
+
+            elif self.movement_stage == 4:
+                # Étape 5 : Se déplacer horizontalement vers la tour de destination
+                self.deplacer_vers_axe(destination - 1)
+                self.movement_stage += 1
+
+            elif self.movement_stage == 5:
+                # Étape 6 : Descendre le bras pour déposer le palet
+                self.robot_arm_y = 250
+                self.update()
+                self.movement_stage += 1
+
+            elif self.movement_stage == 6:
+                # Étape 7 : Déposer le palet
+                self.grab_pallet(palets_destination_before, grab=False)
+                self.movement_stage += 1
+
+            elif self.movement_stage == 7:
+                # Étape 8 : Remonter à la position initiale
+                self.robot_arm_y = 50
+                self.update()
+                self.movement_stage = 0
+                self.index += 1
+                self.current_move = None  # Réinitialiser pour passer au mouvement suivant
+
+    def deplacer_vers_axe(self, cible):
+        """Déplace le bras horizontalement de manière progressive."""
+        target_x = self.tower_positions[cible]
+        step = 5 if target_x > self.robot_arm_x else -5  # Réduire l'incrément pour un mouvement plus lent
+
+        # Si la distance est assez petite, on ajuste directement la position sans incrément
+        if abs(self.robot_arm_x - target_x) <= 5:
+            self.robot_arm_x = target_x
         else:
-            self.timer.stop()
+            self.robot_arm_x += step
 
-    def descend_arm(self, destination):
-        """Fait descendre le bras lentement et relâche le palet."""
-        self.robot_arm_y = 250
         self.update()
-        QTimer.singleShot(1500, lambda: self.drop_palet(destination))  # ⏳ Animation plus lente
 
-    def drop_palet(self, destination):
-        """Dépose le palet et remonte le bras."""
-        self.towers[destination].append(self.robot_holding_palet)
-        self.robot_holding_palet = None
-        self.robot_arm_y = 50
-        self.robot_arm_x = self.tower_positions[destination]
+
+    def grab_pallet(self, palets_before, grab):
+        """Attrape ou relâche un palet."""
+        if grab:
+            if isinstance(palets_before, list) and palets_before:
+                self.robot_holding_palet = palets_before[-1]  # Attrape le dernier palet
+                self.last_palet_moved = self.robot_holding_palet
+                # Ajout d'une vérification et affichage pour déboguer
+                print(f"Valeur de self.robot_arm_x: {self.robot_arm_x}")
+                print(f"Liste des positions de tours: {self.tower_positions}")
+                
+                if self.robot_arm_x not in self.tower_positions:
+                    print(f"Erreur: {self.robot_arm_x} n'est pas dans {self.tower_positions}")
+                    return  # Arrêter l'exécution si la position n'est pas valide
+
+                current_tower = self.tower_positions.index(self.robot_arm_x)
+                self.towers[current_tower].pop()
+            elif isinstance(palets_before, int):
+                self.robot_holding_palet = palets_before  # Si c'est un seul entier, on l'attrape directement
+                self.last_palet_moved = palets_before
+        else:
+            if self.robot_holding_palet:
+                # Ajout d'une vérification et affichage pour déboguer
+                print(f"Valeur de self.robot_arm_x: {self.robot_arm_x}")
+                print(f"Liste des positions de tours: {self.tower_positions}")
+                
+                if self.robot_arm_x not in self.tower_positions:
+                    print(f"Erreur: {self.robot_arm_x} n'est pas dans {self.tower_positions}")
+                    return  # Arrêter l'exécution si la position n'est pas valide
+                
+                current_tower = self.tower_positions.index(self.robot_arm_x)
+                self.towers[current_tower].append(self.robot_holding_palet)
+                self.robot_holding_palet = None
+
         self.update()
 
     def paintEvent(self, event):
@@ -87,7 +160,6 @@ class SimuAlgoEtBras(QWidget):
             painter.drawRect(self.robot_arm_x - self.palet_widths[self.robot_holding_palet - 1] // 2,
                              self.robot_arm_y + 50,
                              self.palet_widths[self.robot_holding_palet - 1], 20)
-
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
