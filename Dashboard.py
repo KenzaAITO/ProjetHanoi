@@ -42,7 +42,6 @@ class Dashboard(QMainWindow):
         self.timer = QTimer(self)
         self.timer.timeout.connect(self.update_dashboard)
         self.timer.start(1000)  # Met à jour chaque seconde pour la démo
-
         # Variables pour l'état de la ventouse et du coup en cours
         self.grab_on = False
         self.current_move = None
