@@ -39,7 +39,9 @@ class SimuAlgoEtBras(QWidget):
             if self.movement_stage == 0:
                 # Étape 1 : Se déplacer horizontalement vers la tour d'origine
                 self.deplacer_vers_axe(origine - 1)
-                self.movement_stage += 1
+                if self.robot_arm_x == self.tower_positions[origine - 1]:
+                    self.movement_stage += 1  # Passer à l'étape suivante
+                self.update()
 
             elif self.movement_stage == 1:
                 # Étape 2 : Descendre pour attraper le palet
@@ -48,7 +50,7 @@ class SimuAlgoEtBras(QWidget):
                 self.movement_stage += 1
 
             elif self.movement_stage == 2:
-                # Étape 3 : Attraper le palet et le retirer de la tour d'origine
+                # Étape 3 : Attraper le palet
                 self.grab_pallet(palets_origin_before, grab=True)
                 self.movement_stage += 1
 
@@ -61,7 +63,9 @@ class SimuAlgoEtBras(QWidget):
             elif self.movement_stage == 4:
                 # Étape 5 : Se déplacer horizontalement vers la tour de destination
                 self.deplacer_vers_axe(destination - 1)
-                self.movement_stage += 1
+                if self.robot_arm_x == self.tower_positions[destination - 1]:
+                    self.movement_stage += 1  # Passer à l'étape suivante
+                self.update()
 
             elif self.movement_stage == 5:
                 # Étape 6 : Descendre le bras pour déposer le palet
@@ -93,8 +97,8 @@ class SimuAlgoEtBras(QWidget):
         else:
             self.robot_arm_x += step
 
+        # Mise à jour de la vue
         self.update()
-
 
     def grab_pallet(self, palets_before, grab):
         """Attrape ou relâche un palet."""
