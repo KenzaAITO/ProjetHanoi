@@ -2,15 +2,22 @@ import sys
 from PyQt6.QtWidgets import QApplication, QWidget
 from PyQt6.QtGui import QPainter, QColor, QBrush
 from PyQt6.QtCore import Qt, QTimer
+from PyQt6.QtWidgets import QMainWindow, QLabel, QVBoxLayout, QHBoxLayout
 from BlocAlgo.HanoiIterative import HanoiIterative
+from Dashboard import Dashboard
 
 VITESSE_MOVE = 80
 
-class SimuAlgoEtBras(QWidget):
+class SimuAlgoEtBras(QMainWindow):
 
     def __init__(self, algorithm):
         super().__init__()
-        self.algorithm = algorithm
+
+        self.setWindowTitle("Simulation de Hanoi avec Bras Robotisé")
+        self.setGeometry(100, 100, 800, 600)  # Taille et position de la fenêtre
+
+        # Création de la simulation
+        self.algorithm = algorithm  # Cela représente votre classe de simulation
         self.tower_positions = [100, 300, 500]
         self.palet_widths = [80, 70, 60, 50, 40][:self.algorithm.nb_palet_camera]
         self.towers = {0: list(range(1, self.algorithm.nb_palet_camera + 1)), 1: [], 2: []}
@@ -25,8 +32,16 @@ class SimuAlgoEtBras(QWidget):
         self.current_move = None  
 
         self.timer = QTimer(self)
-        self.timer.timeout.connect(self.execute_next_step)
-        self.timer.start(500)  # ⏳ Ralentir encore plus le bras, passage à 0.5s entre chaque mini-mouvement
+        self.timer.timeout.connect(self.update_simulation)
+        self.timer.start(1000)  # Mettre à jour chaque seconde
+        self.dashboard = Dashboard()
+        self.setCentralWidget(self.dashboard)
+        
+        # Variables internes pour la simulation
+        self.grab_on = False
+        self.current_move = "Coup 1"
+        self.pick_height = 0
+        self.drop_height = 1
 
     def execute_next_step(self):
         """Exécute chaque étape d'un déplacement progressivement."""
@@ -226,6 +241,29 @@ class SimuAlgoEtBras(QWidget):
             painter.drawRect(self.robot_arm_x - self.palet_widths[self.robot_holding_palet - 1] // 2,
                              self.robot_arm_y + 50,
                              self.palet_widths[self.robot_holding_palet - 1], 20)
+
+    def update_simulation(self):
+        """Simule l'animation et met à jour les informations."""
+        # Met à jour les informations en fonction de l'état de la simulation
+        self.dashboard.update_grab_state(self.grab_on)
+        self.dashboard.update_current_move(self.current_move)
+        self.dashboard.update_height(self.pick_height, self.drop_height)
+
+    def update_grab(self, grab_on):
+        """Met à jour l'état de la ventouse."""
+        self.grab_on = grab_on
+        self.update_simulation()
+
+    def update_move(self, move_info):
+        """Met à jour le coup en cours."""
+        self.current_move = move_info
+        self.update_simulation()
+
+    def update_height(self, pick_height, drop_height):
+        """Met à jour les hauteurs pour la prise et la dépose."""
+        self.pick_height = pick_height
+        self.drop_height = drop_height
+        self.update_simulation()
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
