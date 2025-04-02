@@ -33,6 +33,8 @@ class DobotControl:
         self.cible_x = 220
         self.cible_y = 0
         self.cible_z = 0
+        self.CALIB_Y = 0
+        self.CALIB_Z = 0
         # Va à la position home
         self.device.home()
         #self.calibrer_hauteur()  # Définir une nouvelle référence Z
@@ -250,17 +252,17 @@ class DobotControl:
     def move_vertical_switch(self, nb_palet):
         match nb_palet:
             case 0:
-                self.cible_z = -80
+                self.cible_z = self.CALIB_Z
             case 1:
-                self.cible_z = -55
+                self.cible_z = self.CALIB_Z + 25
             case 2:
-                self.cible_z = -30
+                self.cible_z = self.CALIB_Z + 50
             case 3:
-                self.cible_z = -5
+                self.cible_z = self.CALIB_Z + 75
             case 4:
-                self.cible_z = 20
+                self.cible_z = self.CALIB_Z + 100
             case 5:
-                self.cible_z = 50
+                self.cible_z = self.CALIB_Z + 125
             case _:
                 raise ValueError(self.ERROR_INVALID_PALLET_COUNT)
             
@@ -271,6 +273,8 @@ class DobotControl:
         app = QApplication(sys.argv)
         window = DobotCalibrator(self)
         window.show()
+        self.CALIB_Y = self.cible_y
+        self.CALIB_Z = self.cible_z
         sys.exit(app.exec())
 
 

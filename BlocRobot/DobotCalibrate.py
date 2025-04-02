@@ -4,7 +4,7 @@ class DobotCalibrator(QWidget):
     def __init__(self, robot):
         super().__init__()
         self.robot = robot
-        self.x = robot.cible_x
+        self.y = robot.cible_y
         self.z = robot.cible_z
         
         self.initUI()
@@ -15,13 +15,13 @@ class DobotCalibrator(QWidget):
         self.label = QLabel(f"X: {self.x}, Z: {self.z}")
         layout.addWidget(self.label)
         
-        self.btn_x_up = QPushButton("X +5")
-        self.btn_x_up.clicked.connect(lambda: self.update_position(dx=5))
-        layout.addWidget(self.btn_x_up)
+        self.btn_y_up = QPushButton("Y +5")
+        self.btn_y_up.clicked.connect(lambda: self.update_position(dy=5))
+        layout.addWidget(self.btn_y_up)
         
-        self.btn_x_down = QPushButton("X -5")
-        self.btn_x_down.clicked.connect(lambda: self.update_position(dx=-5))
-        layout.addWidget(self.btn_x_down)
+        self.btn_y_down = QPushButton("Y -5")
+        self.btn_y_down.clicked.connect(lambda: self.update_position(dy=-5))
+        layout.addWidget(self.btn_y_down)
         
         self.btn_z_up = QPushButton("Z +5")
         self.btn_z_up.clicked.connect(lambda: self.update_position(dz=5))
@@ -37,14 +37,14 @@ class DobotCalibrator(QWidget):
         
         self.setLayout(layout)
     
-    def update_position(self, dx=0, dz=0):
-        self.x += dx
+    def update_position(self, dy=0, dz=0):
+        self.y += dy
         self.z += dz
-        self.robot.move_to_and_check(self.x, self.z)
-        self.label.setText(f"X: {self.x}, Z: {self.z}")
+        self.robot.move_to_and_check(self.y, self.z)
+        self.label.setText(f"Y: {self.y}, Z: {self.z}")
     
     def save_values(self):
-        self.robot.cible_x = self.x
+        self.robot.cible_y = self.y
         self.robot.cible_z = self.z
-        print(f"✅ Calibration enregistrée: X={self.robot.cible_x}, Z={self.robot.cible_z}")
+        print(f"✅ Calibration enregistrée: Y={self.robot.cible_y}, Z={self.robot.cible_z}")
         self.close()
